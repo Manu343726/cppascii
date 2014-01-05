@@ -10,6 +10,7 @@
 ****************************************************************************/
 
 #include "numeric_comparisons.hpp"
+#include "value_wrapper.hpp"
 
 #include <iostream>
 
@@ -27,5 +28,9 @@ int main()
     
     std::cout << ( 2*pi2 - pi2 == pi ) << std::endl; //Ya os digo yo que ni de coña este es true
     std::cout << cpp::numeric_comparisons::equal( 2*pi - pi , pi ) << std::endl; //Pero este si
+    std::cout << ( cpp::wrap( 2*pi2 - pi ) == cpp::wrap( pi ) ) << std::endl; //Mucho más intuitivo de usar, verdad?
+    std::cout << ( cpp::wrap( 2*pi2 - pi ) != cpp::wrap( pi ) ) << std::endl; //Mucho más intuitivo de usar, verdad?
+    std::cout << ( cpp::wrap( 2*pi2 - pi ) >= cpp::wrap( pi ) ) << std::endl; //Mucho más intuitivo de usar, verdad?
+    std::cout << ( cpp::wrap( 2*pi2 - pi ) <= cpp::wrap( pi ) ) << std::endl; //Mucho más intuitivo de usar, verdad?
 }
 

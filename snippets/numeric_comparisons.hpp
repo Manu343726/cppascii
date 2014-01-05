@@ -15,6 +15,8 @@
 #include <type_traits>
 #include <cmath>
 
+#include "value_wrapper.hpp"
+
 /* Eśte módulo provee una sencilla implementación de comparadores para números, teniendo en cuenta si son números en coma
  * flotante o no. Por supuesto está abierta a debate y/o modificaciones, tampoco soy perfecto programando...
  * 
@@ -51,10 +53,10 @@ namespace cpp
         {
             static_assert( PRECISION >= 3 , "No vas a conseguir mucho con tan poca precisión" );
             
-            static bool equal( T lhs , U rhs )
+            static bool equal( const T& lhs , const U& rhs )
             {
                 //La idea es: El usuario especifica la precisión del rango de error como el número de decimales.
-                //Es decir, si precision vale 3, epsilon es 0.003, si vale 5, 0.00001, etc.
+                //Es decir, si precision vale 3, epsilon es 0.001, si vale 5, 0.00001, etc.
                 constexpr decltype( T() * T() ) epsilon = cpp::misc::pow( 10.0 , (int)(-PRECISION) );
                 
                 return std::abs( lhs - rhs ) < epsilon;
@@ -64,7 +66,7 @@ namespace cpp
         template<typename T , typename U , std::size_t PRECISION>
         struct numeric_comparer_impl<T,U,PRECISION,false>
         {
-            static bool equal( T lhs , T rhs )
+            static bool equal( const T& lhs , const U& rhs )
             {
                 return lhs == rhs;
             }
@@ -77,43 +79,80 @@ namespace cpp
     
     namespace numeric_comparisons
     {
-        template<typename T , typename U = T , std::size_t PRECISION = 5>
-        bool equal( T lhs , U rhs )
+        template<typename T , typename U = T>
+        bool equal( const T& lhs , const U& rhs )
         {
-            return numeric_comparer_impl<T,U,PRECISION>::equal( lhs , rhs );
+            return numeric_comparer_impl<T,U>::equal( lhs , rhs );
         }
         
-        template<typename T , typename U = T , std::size_t PRECISION = 5>
-        bool not_equal( T lhs , U rhs )
+        template<typename T , typename U = T>
+        bool not_equal( const T& lhs , const U& rhs )
         {
-            return !numeric_comparer_impl<T,U,PRECISION>::equal( lhs , rhs );
+            return !numeric_comparer_impl<T,U>::equal( lhs , rhs );
         }
         
-        template<typename T , typename U = T , std::size_t PRECISION = 5>
-        bool bigger_than( T lhs , U rhs )
+        template<typename T , typename U = T>
+        bool bigger_than( const T& lhs , const U& rhs )
         {
             return lhs > rhs;
         }
         
-        template<typename T , typename U = T , std::size_t PRECISION = 5>
-        bool bigger_or_equal( T lhs , T rhs )
+        template<typename T , typename U = T>
+        bool bigger_or_equal( const T& lhs , const U& rhs )
         {
-            return lhs > rhs || cpp::numeric_comparisons::equal<PRECISION>( lhs , rhs );
+            return lhs > rhs || cpp::numeric_comparisons::equal( lhs , rhs );
         }
         
-        template<typename T , typename U = T , std::size_t PRECISION = 5>
-        bool less_than( T lhs , T rhs )
+        template<typename T , typename U = T>
+        bool less_than( const T& lhs , const U& rhs )
         {
             return lhs < rhs;
         }
         
-        template<typename T , typename U = T , std::size_t PRECISION = 5>
-        bool less_or_equal( T lhs , U rhs )
+        template<typename T , typename U = T>
+        bool less_or_equal( const T& lhs , const U& rhs )
         {
-            return lhs < rhs || numeric_comparer_impl<T,U,PRECISION>::equal( lhs , rhs );
+            return lhs < rhs || cpp::numeric_comparisons::equal( lhs , rhs );
         } 
-    };
+    }
     
+    
+    
+    template<typename LHS , typename RHS , bool LHS_F , bool RHS_F>
+    bool operator==( const cpp::value_wrapper<LHS,LHS_F>& lhs , const cpp::value_wrapper<RHS,RHS_F>& rhs )
+    {
+        return cpp::numeric_comparisons::equal( lhs.ref() , rhs.ref() );
+    }
+    
+    template<typename LHS , typename RHS , bool LHS_F , bool RHS_F>
+    bool operator!=( const cpp::value_wrapper<LHS,LHS_F>& lhs , const cpp::value_wrapper<RHS,RHS_F>& rhs )
+    {
+        return cpp::numeric_comparisons::not_equal( lhs.ref() , rhs.ref() );
+    }
+        
+    template<typename LHS , typename RHS , bool LHS_F , bool RHS_F>
+    bool operator>( const cpp::value_wrapper<LHS,LHS_F>& lhs , const cpp::value_wrapper<RHS,RHS_F>& rhs )
+    {
+        return cpp::numeric_comparisons::bigger_than( lhs.ref() , rhs.ref() );
+    }
+            
+    template<typename LHS , typename RHS , bool LHS_F , bool RHS_F>
+    bool operator<( const cpp::value_wrapper<LHS,LHS_F>& lhs , const cpp::value_wrapper<RHS,RHS_F>& rhs )
+    {
+        return cpp::numeric_comparisons::less_than( lhs.ref() , rhs.ref() );
+    }
+                
+    template<typename LHS , typename RHS , bool LHS_F , bool RHS_F>
+    bool operator>=( const cpp::value_wrapper<LHS,LHS_F>& lhs , const cpp::value_wrapper<RHS,RHS_F>& rhs )
+    {
+        return cpp::numeric_comparisons::bigger_or_equal( lhs.ref() , rhs.ref() );
+    }
+    
+    template<typename LHS , typename RHS , bool LHS_F , bool RHS_F>
+    bool operator<=( const cpp::value_wrapper<LHS,LHS_F>& lhs , const cpp::value_wrapper<RHS,RHS_F>& rhs )
+    {
+        return cpp::numeric_comparisons::less_or_equal( lhs.ref() , rhs.ref() );
+    }
 }
 
 #endif	/* FLOAT_COMP_HPP */

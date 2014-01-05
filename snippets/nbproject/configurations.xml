@@ -13,6 +13,7 @@
     <logicalFolder name="HeaderFiles" displayName="utils" projectFiles="true">
       <itemPath>numeric_comparisons.hpp</itemPath>
       <itemPath>to_string.hpp</itemPath>
+      <itemPath>value_wrapper.hpp</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
                    displayName="Test Files"
@@ -45,6 +46,8 @@
       </item>
       <item path="to_string.hpp" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="value_wrapper.hpp" ex="false" tool="3" flavor2="0">
+      </item>
     </conf>
     <conf name="Release" type="1">
       <toolsSet>
@@ -72,6 +75,8 @@
       <item path="numeric_comparisons.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="to_string.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="value_wrapper.hpp" ex="false" tool="3" flavor2="0">
       </item>
     </conf>
   </confs>
