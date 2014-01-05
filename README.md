@@ -6,7 +6,7 @@ Un pequeño curso sobre la programación en C++ orientado al desarrollo de video
 
 ## Horario
 
-Martes 17:00 - 18:00, aula 13 Facultad de Informática UCM
+Martes 17:00 - 18:00, aula 13 Facultad de Informática UCM    
 Jueves 16:00 - 17:30, aula 13 Facultad de Informática UCM
 
 *Éste horario está sujeto a cambios a partir de Febrero. Segúramente hagamos una pequeña encuesta para ver que horario nos viene mejor a todos.*

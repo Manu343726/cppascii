@@ -1,5 +1,7 @@
 /****************************************************************************
 * Snippets, ejemplos, y utilidades del curso de C++ orientado a videojuegos *
+* https://github.com/Manu343726/CppVideojuegos/                             *
+*                                                                           * 
 * Copyright © 2014 Manuel Sánchez Pérez                                     *
 *                                                                           *
 * This program is free software. It comes without any warranty, to          *
