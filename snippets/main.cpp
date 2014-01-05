@@ -9,6 +9,7 @@
 * http://www.wtfpl.net/  and the COPYING file for more details.             *
 ****************************************************************************/
 
+#define USE_BITWISE_COMPARISON
 #include "numeric_comparisons.hpp"
 #include "value_wrapper.hpp"
 

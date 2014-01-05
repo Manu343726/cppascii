@@ -14,6 +14,7 @@
 
 #include <type_traits>
 #include <cmath>
+#include <limits>
 
 #include "value_wrapper.hpp"
 
@@ -22,6 +23,11 @@
  * 
  * No os preocupéis si ahora no entendéis la implementación, con el tiempo deberíais entenderla (Ese es el objetivo del curso).
  * Por ahora fijaos en la implementación de numeric_comparer_impl::equal() para coma flotante (La primera). 
+ * 
+ * Técnicamente usar un rango de error no es una buena manera de hacerlo, pero es la más sencilla. Si de verdad quieres hacerlo bien 
+ * tienes que tener en cuenta infinitos, números denormalizados, NaNs, etc. La coma flotante no es una cosa sencilla. 
+ * La manera recomendada de hacer ésto es obtener el patron de bits de ambos números y comparar, pero eso requiere hacer castings
+ * extraños y tampoco quiero liaros mucho con ésto.
  */
 
 namespace cpp
@@ -32,6 +38,8 @@ namespace cpp
         template<typename T , typename U , typename sfinae_it_please = typename std::enable_if<std::is_integral<U>::value>::type>
         constexpr auto pow( T base , U exp ) -> decltype( base * base )
         {
+            //Un poco horrible, verdad? constexpr solo permite return loquesea como cuerpo de la función. Gracias a Dios ésta regla
+            //la han relajado en C++14.
             return exp == 0 ? 1 : ( exp < 0 ? ( 1.0 / cpp::misc::pow( base , -exp ) ) : base * cpp::misc::pow( base , exp - 1 ) );
         }
     }
@@ -46,25 +54,19 @@ namespace cpp
      */
     namespace
     {
-        template<typename T , typename U = T , std::size_t PRECISION = 5 , bool is_floating_point = std::is_floating_point<T>::value ||
-                                                                                                    std::is_floating_point<U>::value
+        template<typename T , typename U = T , bool is_floating_point = std::is_floating_point<T>::value ||
+                                                                        std::is_floating_point<U>::value
                 >
         struct numeric_comparer_impl
         {
-            static_assert( PRECISION >= 3 , "No vas a conseguir mucho con tan poca precisión" );
-            
             static bool equal( const T& lhs , const U& rhs )
-            {
-                //La idea es: El usuario especifica la precisión del rango de error como el número de decimales.
-                //Es decir, si precision vale 3, epsilon es 0.001, si vale 5, 0.00001, etc.
-                constexpr decltype( T() * T() ) epsilon = cpp::misc::pow( 10.0 , (int)(-PRECISION) );
-                
-                return std::abs( lhs - rhs ) < epsilon;
+            { 
+                return std::abs( lhs - rhs ) < std::numeric_limits<T>::epsilon();
             }
         };
         
-        template<typename T , typename U , std::size_t PRECISION>
-        struct numeric_comparer_impl<T,U,PRECISION,false>
+        template<typename T , typename U>
+        struct numeric_comparer_impl<T,U,false>
         {
             static bool equal( const T& lhs , const U& rhs )
             {
