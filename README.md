@@ -2,15 +2,22 @@
 
 # C++ Orientado a la programación de Videojuegos
 
+Un pequeño curso sobre la programación en C++ orientado al desarrollo de videojuegos.
+
+## Horario
+
+Martes 17:00 - 18:00, aula 13 Facultad de Informática UCM
+Jueves 16:00 - 17:30, aula 13 Facultad de Informática UCM
+
+*Éste horario está sujeto a cambios a partir de Febrero. Segúramente hagamos una pequeña encuesta para ver que horario nos viene mejor a todos.*
 
 ## Temario
 
-*Este temario es únicamente un roadmap de lo que creo que debe quedar bien claro en cuanto a C++ se refiere.
-Como puede verse no incluye nada específico sobre videojuegos. La idea es explicar los conceptos básicos de videojuegos y hacer videojuegos sencillos,
-como un Pong, un arcanoid, Tetris, el Juego de La Vida, etc.  
-Pero poder hacer juegos bien requiere de una experiencia en el lenguaje que seguramente en un principio se carece. Así que en las clases se dará C++11 desde el principio, explicando todos los conceptos para que os quede bien claro como funciona.
-Mi objetivo no es que seáis expertos en C++, sino que entendáis que es lo que hacéis, y seais conscientes de lo que hacen vuestros programas, el compilador, y el lenguaje. Por supuesto cuanto más demos de juegos mejor, y todos los ejemplos, prácticas, etc los haré sobre juegos o cosas relacionadas con ellos.  
-El punto 5 se considera C++ avanzado, así que no pasaría nada si no llego a darlo del todo, pero hasta el punto 4 se considera muy importante (Importante quiere decir que si no tienes perfectamente claro hasta ahí no sabes C++).*
+*Este temario es únicamente un roadmap de lo que creo que debe quedar bien claro en cuanto a C++ se refiere.*
+*Como puede verse no incluye nada específico sobre videojuegos. La idea es explicar los conceptos básicos de videojuegos y hacer videojuegos sencillos,como un Pong, un arcanoid, Tetris, el Juego de La Vida, etc.*    
+*Pero poder hacer juegos bien requiere de una experiencia en el lenguaje que seguramente en un principio se carece. Así que en las clases se dará C++11 desde el principio, explicando todos los conceptos para que os quede bien claro como funciona.*
+*Mi objetivo no es que seáis expertos en C++, sino que entendáis que es lo que hacéis, y seais conscientes de lo que hacen vuestros programas, el compilador, y el lenguaje. Por supuesto cuanto más demos de juegos mejor, y todos los ejemplos, prácticas, etc los haré sobre juegos o cosas relacionadas con ellos.*    
+*El punto 5 se considera C++ avanzado, así que no pasaría nada si no llego a darlo del todo, pero hasta el punto 4 se considera muy importante (Importante quiere decir que si no tienes perfectamente claro hasta ahí no sabes C++).*
 
 
 0. **Sistema Operativo, Hardware, etc: ¿Donde y cómo se ejecuta mi programa?**  
@@ -145,3 +152,10 @@ Es el libro que te abre los ojos a lo que C++ puede llegar a hacer.
 ### Bonus
 Además de esos libros, os he incluido una serie de PDFs que cubren tres aspectos: APIs gráficas de bajo nivel, sistemas gráficos (Sistemas de ventanas), y teoría y algoritmos sobre computación gráfica en general.  
 Las APIs gráficas y los sistemas de ventanas los he puesto para que seáis conscientes de lo que hay debajo cuando usais programillas en Windows y Linux, y de todo lo que te abstrae las APIs de programación de juegos de medio y alto nivel.
+
+Y por Dios, no cojáis (Y menos compréis) libros de Francisco Javier Ceballos.
+
+## Código fuente del curso
+
+Tenéis disponible [un repositorio en github](https://github.com/Manu343726/CppVideojuegos) donde iremos colgando ejemplos, utilidades, y fragmentos de código que vayamos viendo.   
+Dicho código fuente está licenciado bajo [*Do What the Fuck You Want to Public License (WTFPL)*](http://www.wtfpl.net/) con algunas modificaciones. Revisad el archivo `COPYING.txt` ([link](https://github.com/Manu343726/CppVideojuegos/blob/master/COPYING.txt)) para tener más información al respecto.
