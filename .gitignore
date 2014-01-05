@@ -11,3 +11,6 @@
 *.lai
 *.la
 *.a
+/snippets/build/
+/snippets/dist/
+/PDFs/

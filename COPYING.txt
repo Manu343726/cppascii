@@ -1,0 +1,31 @@
+            DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+                    Version 2, December 2004
+
+ Copyright (C) 2004 Sam Hocevar <sam@hocevar.net>
+
+ Everyone is permitted to copy and distribute verbatim or modified
+ copies of this license document, and changing it is allowed as long
+ as the name is changed.
+
+CppVideojuegos
+Copyright (c) 2014 Manuel Sánchez Pérez
+
+This project contains code snippets from the Turbo C++11 Metaprogramming
+Library (http://github.com/Manu343726/Turbo) and the cpp_lib32 project 
+(https://github.com/Manu343726/cpp_lib32), both released with the Lesser 
+General Public License v2.  
+
+Files containing that snippets are easily identificable by its LGPL2 header
+instead of the WTFPL which this project uses by default. 
+Every non-LGPL code provided by this project is licensed with the WTFPL and 
+should be treated in that way (Do just what the fuck you want with that code), 
+but your usage of the other code must fullfill the requeriments and terms of 
+its license (Check the websites provided above for more info). 
+
+            DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+   TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
+
+  0. That said, just DO WHAT THE FUCK YOU WANT TO.
+
+
+
