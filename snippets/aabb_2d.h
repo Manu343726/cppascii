@@ -1,8 +1,15 @@
-/* Manuel S�nchez P�rez */
-/* Rayner Tan           */
-
-/* Esta clase representa AABBs 2D. Contiene m�todos para la facil creaci�n de AABBs, as� como test de colisi�n y pertenencia. */
-
+/****************************************************************************
+* Snippets, ejemplos, y utilidades del curso de C++ orientado a videojuegos *
+* https://github.com/Manu343726/CppVideojuegos/                             *
+*                                                                           * 
+* Copyright © 2014 Manuel Sánchez Pérez                                     *
+*                                                                           *
+* This program is free software. It comes without any warranty, to          *
+* the extent permitted by applicable law. You can redistribute it           *
+* and/or modify it under the terms of the Do What The Fuck You Want         *
+* To Public License, Version 2, as published by Sam Hocevar. See            *
+* http://www.wtfpl.net/  and the COPYING file for more details.             *
+****************************************************************************/
 
 #ifndef AABB_2D_H
 #define AABB_2D_H
@@ -10,10 +17,11 @@
 #include "math_2d.h"
 #include <vector>
 
-namespace ig {
+namespace cpp {
 
     template<typename T>
     class aabb_2d
+    {
     private:
 
         aabb_2d(T x, T y, T width, T height) :
@@ -75,7 +83,7 @@ namespace ig {
         template<typename U>
         operator aabb_2d<U>() const
         {
-            return ig::aabb_2d<U>::from_coords_and_size(origin, size);
+            return cpp::aabb_2d<U>::from_coords_and_size(origin, size);
         }
 
         //Getters (Info)
@@ -109,15 +117,15 @@ namespace ig {
         }
 
         dl32::vector_2d<T> top_left_corner() const {
-            return position_type(origin.x, origin.y + size.y);
+            return dl32::vector_2d<T>(origin.x, origin.y + size.y);
         }
 
         dl32::vector_2d<T> top_right_corner() const {
-            return position_type(origin.x + size.x, origin.y + size.y);
+            return dl32::vector_2d<T>(origin.x + size.x, origin.y + size.y);
         }
 
         dl32::vector_2d<T> bottom_right_corner() const {
-            return position_type(origin.x + size.x, origin.y);
+            return dl32::vector_2d<T>(origin.x + size.x, origin.y);
         }
 
         dl32::vector_2d<T> bottom_left_corner() const {

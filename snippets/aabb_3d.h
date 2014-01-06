@@ -1,35 +1,40 @@
-/* Manuel S�nchez P�rez */
-/* Rayner Tan           */
-
-/* Esta clase representa AABBs 2D. Contiene m�todos para la facil creaci�n de AABBs, as� como test de colisi�n y pertenencia. */
-
+/****************************************************************************
+* Snippets, ejemplos, y utilidades del curso de C++ orientado a videojuegos *
+* https://github.com/Manu343726/CppVideojuegos/                             *
+*                                                                           * 
+* Copyright © 2014 Manuel Sánchez Pérez                                     *
+*                                                                           *
+* This program is free software. It comes without any warranty, to          *
+* the extent permitted by applicable law. You can redistribute it           *
+* and/or modify it under the terms of the Do What The Fuck You Want         *
+* To Public License, Version 2, as published by Sam Hocevar. See            *
+* http://www.wtfpl.net/  and the COPYING file for more details.             *
+****************************************************************************/
 
 #ifndef AABB_2D_H
-#define AABB_2D_H
+#define AABB_3D_H
 
-#include "ig_types.h"
+#include "vector_3d.hpp"
 #include "value_wrapper.hpp"
 #include "numeric_comparisons.hpp"
 
 #include <vector>
 
-namespace ig {
+namespace cpp {
 
     template<typename T>
-    class aabb_3d : public ig::entity_3d_traits<T> {
-    public:
-        typedef ig::entity_3d_traits<T> traits;
+    class aabb_3d
+    {
     private:
-
-        aabb_3d(typename traits::coordinate_type x, typename traits::coordinate_type y, typename traits::coordinate_type z,
-                typename traits::coordinate_type width, typename traits::coordinate_type height , typename traits::coordinate_type depth ) :
+        aabb_3d(T x, T y, T z,
+                T width, T height , T depth ) :
         origin(x , y , z),
         size(width, height, depth) {
         }
 
     public:
-        typename traits::position_type origin;
-        typename traits::size_type size;
+        cpp::vector_3d<T> origin;
+        cpp::vector_3d<T> size;
 
         //Construction through the named constructor idiom:
 
@@ -37,29 +42,29 @@ namespace ig {
             return aabb_3d(0, 0, 0, 0 , 0 , 0);
         }
 
-        static aabb_3d from_coords_and_size(typename traits::coordinate_type x, typename traits::coordinate_type y, typename traits::coordinate_type z,
-                                            typename traits::coordinate_type width, typename traits::coordinate_type height , typename traits::coordinate_type depth ) 
+        static aabb_3d from_coords_and_size(T x, T y, T z,
+                                            T width, T height , T depth ) 
         {
             return aabb_3d(x, y, z, width, height, depth);
         }
 
-        static aabb_3d from_coords_and_size(const typename traits::position_type& origin, const typename traits::size_type& size) {
+        static aabb_3d from_coords_and_size(const cpp::vector_3d<T>& origin, const cpp::vector_3d<T>& size) {
             return aabb_3d(origin.x, origin.y,origin.z, size.x, size.y,size.z);
         }
 
-        static aabb_3d from_corners(const typename traits::position_type& front_bottom_left, const typename traits::position_type& back_top_right) {
+        static aabb_3d from_corners(const cpp::vector_3d<T>& front_bottom_left, const cpp::vector_3d<T>& back_top_right) {
             return aabb_3d(front_bottom_left.x, front_bottom_left.y, front_bottom_left.z,
                            (back_top_right.x - front_bottom_left.x), (back_top_right.y - front_bottom_left.y), (back_top_right.z - front_bottom_left.z));
         }
 
-        static aabb_3d from_limits(typename traits::coordinate_type top, typename traits::coordinate_type bottom, typename traits::coordinate_type left, typename traits::coordinate_type right , 
-                                   typename traits::coordinate_type front , typename traits::coordinate_type back ) 
+        static aabb_3d from_limits(T top, T bottom, T left, T right , 
+                                   T front , T back ) 
         {
             return aabb_3d(left, bottom, front, (right - left), (top - bottom ) , (back-bottom));
         }
 
-        static aabb_3d from_points(const std::initializer_list<typename traits::position_type>& points) {
-            typename traits::coordinate_type top(points.begin()->y), 
+        static aabb_3d from_points(const std::initializer_list<cpp::vector_3d<T>>& points) {
+            T top(points.begin()->y), 
                                              bottom(points.begin()->y), 
                                              left(points.begin()->x), 
                                              right(points.begin()->x),
@@ -95,69 +100,79 @@ namespace ig {
         template<typename U>
         operator aabb_3d<U>() const
         {
-            return ig::aabb_3d<U>::from_coords_and_size(origin, size);
+            return cpp::aabb_3d<U>::from_coords_and_size(origin, size);
         }
 
         //Getters (Info)
 
-        typename traits::position_type center() const {
+        cpp::vector_3d<T> center() const {
             return origin + (size / 2);
         }
 
-        typename traits::coordinate_type width() const {
+        T width() const {
             return size.x;
         }
 
-        typename traits::coordinate_type height() const {
+        T height() const {
             return size.y;
         }
 
-        typename traits::coordinate_type top() const {
+        T top() const {
             return origin.y + size.y;
         }
 
-        typename traits::coordinate_type left() const {
+        T left() const {
             return origin.x;
         }
 
-        typename traits::coordinate_type bottom() const {
+        T bottom() const {
             return origin.y;
         }
 
-        typename traits::coordinate_type right() const {
+        T right() const {
             return origin.x + size.x;
         }
-
-        typename traits::position_type front_top_left_corner() const {
-            return position_type(origin.x, origin.y + size.y , origin.z);
+        
+        T front() const
+        {
+            return origin.z;
+        }
+        
+        T back() const
+        {
+            return origin.z + size.z;
         }
 
-        typename traits::position_type front_top_right_corner() const {
-            return position_type(origin.x + size.x, origin.y + size.y , origin.z);
+        cpp::vector_3d<T> front_top_left_corner() const {
+            return cpp::vector_3d<T>(origin.x, origin.y + size.y , origin.z);
         }
 
-        typename traits::position_type front_bottom_right_corner() const {
-            return position_type(origin.x + size.x, origin.y , origin.z);
+        cpp::vector_3d<T> front_top_right_corner() const {
+            return cpp::vector_3d<T>(origin.x + size.x, origin.y + size.y , origin.z);
         }
 
-        typename traits::position_type front_bottom_left_corner() const {
+        cpp::vector_3d<T> front_bottom_right_corner() const {
+            return cpp::vector_3d<T>(origin.x + size.x, origin.y , origin.z);
+        }
+
+        cpp::vector_3d<T> front_bottom_left_corner() const {
             return origin;
         }
         
-        typename traits::position_type back_top_left_corner() const {
-            return position_type(origin.x, origin.y + size.y , origin.z + size.z);
+        cpp::vector_3d<T> back_top_left_corner() const {
+            return cpp::vector_3d<T>(origin.x, origin.y + size.y , origin.z + size.z);
         }
 
-        typename traits::position_type back_top_right_corner() const {
-            return position_type(origin.x + size.x, origin.y + size.y , origin.z + size.z);
+        cpp::vector_3d<T> back_top_right_corner() const {
+            return cpp::vector_3d<T>(origin.x + size.x, origin.y + size.y , origin.z + size.z);
         }
 
-        typename traits::position_type back_bottom_right_corner() const {
-            return position_type(origin.x + size.x, origin.y , origin.z + size.z);
+        cpp::vector_3d<T> back_bottom_right_corner() const {
+            return cpp::vector_3d<T>(origin.x + size.x, origin.y , origin.z + size.z);
         }
 
-        typename traits::position_type back_bottom_left_corner() const {
-            return position_type(origin.x, origin.y , origin.z + size.z);
+        cpp::vector_3d<T> back_bottom_left_corner() const {
+            return cpp::vector_3d<T>(origin.x, origin.y , origin.z + size.z);
         }
 
         static bool overlap(const aabb_3d& a, const aabb_3d& b) {
@@ -211,7 +226,7 @@ namespace ig {
 
         }
 
-        bool belongs_to(const typename traits::position_type& point) const {
+        bool belongs_to(const cpp::vector_3d<T>& point) const {
             return cpp::wrap( point.x ) >= cpp::wrap( left() )   &&
                    cpp::wrap( point.x ) <= cpp::wrap( right() )  &&
                    cpp::wrap( point.y ) >= cpp::wrap( bottom() ) &&
@@ -224,7 +239,7 @@ namespace ig {
     //Apa�os (Simplifican las cosas):
 
     template<typename T>
-    class aabb_3d<ig::math::vector_3d<T >> : public aabb_3d<T>
+    class aabb_3d<cpp::vector_3d<T >> : public aabb_3d<T>
     {
     };
 
