@@ -34,6 +34,7 @@ sf::Vector2f particles_source;
 sf::Vector2f blackhole_position;
 
 sf::RenderWindow window;
+int fps( 0 );
 //std::unordered_map<int,std::function<void(sf::Event&)>> events_manager;
 
 
@@ -46,7 +47,7 @@ void events_loop()
         switch( event_data.type )
         {
             case sf::Event::MouseMoved:
-                if( sf::Keyboard::isKeyPressed( sf::Keyboard::LControl ) )
+                if( !sf::Keyboard::isKeyPressed( sf::Keyboard::LControl ) )
                 {
                     particles_source.x = event_data.mouseMove.x;
                     particles_source.y = event_data.mouseMove.y;
@@ -65,13 +66,16 @@ void events_loop()
                 break;
             case sf::Event::MouseButtonPressed:
                 if( event_data.mouseButton.button == sf::Mouse::Button::Left  ) particles.resize( particles.size() * 2 );
-                if( event_data.mouseButton.button == sf::Mouse::Button::Right ) particles.resize( (particles.size() / 2) + 1 );
+                if( event_data.mouseButton.button == sf::Mouse::Button::Right ) particles.resize( (particles.size() / 2) );
                 break;
             case sf::Event::Closed:
                 window.close(); break;
         }
         
         //events_manager[(int)event_data.type]( event_data );
+        
+        std::cout << "Paticle simulation (" << particles.size() << " particles, " 
+                  << fps << " FPS)" << std::endl;
     }
 }
 
@@ -84,11 +88,9 @@ void game_loop()
     
     std::vector<sf::Vertex> vertices;
     
-    typename std::chrono::high_resolution_clock::time_point begin , end;
-    
     while( window.isOpen() )
     {
-        begin = std::chrono::high_resolution_clock::now();
+        auto begin = std::chrono::high_resolution_clock::now();
                 
         events_loop();
         
@@ -134,20 +136,20 @@ void game_loop()
         window.draw( vertices.data() , vertices.size() , sf::Points );
         window.display();
         
-        end = std::chrono::high_resolution_clock::now();
-        std::stringstream ss;
-        
-        ss << std::fixed << std::setprecision( 0 )
-           << "Paticle simulation (" << particles.size() << " particles, " 
-           << ( 1000.0f / std::chrono::duration_cast<std::chrono::milliseconds>( end - begin ).count() ) << " FPS)";
-        
-        window.setTitle( ss.str() );
+        auto time =  std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::high_resolution_clock::now() - begin ).count();
+        fps = time > 0 ? 1000 / time : -1;
     }
 }
 
 int main()
 {
     window.create( sf::VideoMode( 800 , 600 ) , "Particles" );
+    
+    blackhole_position.x = 100.0f;
+    blackhole_position.y = 400.0f;
+    
+    particles_source.x = 700.0f;
+    particles_source.y = 200.0f;
     
     particles.resize( particles_count );
     
