@@ -13,6 +13,7 @@
 #include <vector>
 #include <unordered_map>
 #include <random>
+#include <iostream>
 
 
 constexpr std::size_t particles_count = 10000;
@@ -55,11 +56,14 @@ void game_loop()
     
     sf::Vector2f blackhole_position( window.getSize().x / 2.0f , window.getSize().y / 2.0f );
     
+    std::vector<sf::Vertex> vertices;
+    
     while( window.isOpen() )
     {
         events_loop();
         
         window.clear( sf::Color::Black );    
+        vertices.clear();
         
         for( auto& particle : particles )
         {                    
@@ -69,7 +73,7 @@ void game_loop()
 
             if( particle.state() != cpp::particle_state::dead )
             {
-cc                auto distance       = particle.current_position() - blackhole_position;
+                auto distance       = particle.current_position() - blackhole_position;
                 float square_length = distance.x * distance.x + distance.y * distance.y;
                 float length        = std::sqrt( square_length );
 
@@ -79,7 +83,7 @@ cc                auto distance       = particle.current_position() - blackhole_
             {
                 sf::Color color( cdist( prng ) , cdist( prng ) , cdist( prng ) );
                 sf::Vector2f init_speed( fdist( prng ) , fdist( prng ) );
-                init_speed /= std::sqrt( init_speed.x * init_speed.x + init_speed.y * init_speed.y );
+                init_speed /= std::sqrt( init_speed.x * init_speed.x + init_speed.y * init_speed.y ) * 10;
 
 
                 particle.restart( particles_source , 
@@ -89,12 +93,15 @@ cc                auto distance       = particle.current_position() - blackhole_
                                 );
 
             }
+            
+            std::cout << particle.current_position().x << std::endl;
 
             sf::Vertex vertex( particle.current_position() , particle.color );
 
-            window.draw( &vertex , 1 , sf::Points );     
+            vertices.emplace_back( particle.current_position() , particle.color );
         }
 
+        window.draw( vertices.data() , vertices.size() , sf::Points );
         window.display();
     }
 }

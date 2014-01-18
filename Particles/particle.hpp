@@ -51,7 +51,7 @@ namespace cpp
             position   = init_pos;
             speed      = init_speed;
             this->color      = color;
-            mass       = mass;
+            this->mass       = mass;
             life_ahead = lifetime;
         }
         
