@@ -163,7 +163,7 @@ struct foo : public instantation_profiler<foo>
 struct scoped_call
 {
 private:
-	std::function<void()> function;
+	std::function<void()> function;	
 
 public:
 	scoped_call( const std::function<void()>& f ) : function( f ) {}
@@ -219,10 +219,10 @@ void h( T&& afoo )
 
 int main()
 {
-    std::cout << std::endl << "Just before a declaration ( foo a; )"                << std::endl;                                        foo a;
-    std::cout << std::endl << "Just before b declaration ( foo b; )"                << std::endl;                                        foo b;
-    std::cout << std::endl << "Just before c declaration ( foo c; )"                << std::endl;                                        foo c;
-    std::cout << std::endl << "Just before d declaration ( foo d( f() ); )"         << std::endl;                                        foo d( f() );
+	std::cout << std::endl << "Just before a declaration ( foo a; )"                << std::endl;                                        foo a;
+	std::cout << std::endl << "Just before b declaration ( foo b; )"                << std::endl;                                        foo b;
+	std::cout << std::endl << "Just before c declaration ( foo c; )"                << std::endl;                                        foo c;
+	std::cout << std::endl << "Just before d declaration ( foo d( f() ); )"         << std::endl;                                        foo d( f() );
 
 	std::cout << std::endl << "Just before a to b assigment ( b = a )"              << std::endl;                                        b = a;
 	std::cout << std::endl << "Just before ctor call to b assigment ( b = foo() )"  << std::endl;                                        b = foo();
