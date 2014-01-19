@@ -25,9 +25,10 @@ private:
 	                   _ctor , _copy_ctor , _move_ctor ,
 	                   _copy_assign , _move_assign;
 
+    std::size_t _id;
 
 public:
-	instantation_profiler()
+	instantation_profiler() : _id( _instanced )
 	{
 		_alive++;
 		_instanced++;
@@ -36,16 +37,16 @@ public:
 		if( MESSAGES ) std::cout << ">> construction" << std::endl;
 	}
 
-	instantation_profiler( const instantation_profiler& )
+	instantation_profiler( const instantation_profiler& other ) : _id( _instanced )
 	{
 		_alive++;
 		_instanced++;
 		_copy_ctor++;
 
-		if( MESSAGES ) std::cout << ">> copy construction" << std::endl;
+		if( MESSAGES ) std::cout << ">> copy construction (" << _id << " <== ID" << other.id() << ")" << std::endl;
 	}
 
-	instantation_profiler( instantation_profiler&& )
+	instantation_profiler( instantation_profiler&& ) : _id( _instanced )
 	{
 		_alive++;
 		_instanced++;
@@ -54,11 +55,11 @@ public:
 		if( MESSAGES ) std::cout << ">> move construction" << std::endl;
 	}
 
-	instantation_profiler& operator=( const instantation_profiler& )
+	instantation_profiler& operator=( const instantation_profiler& other )
 	{
 		_copy_assign++;
 
-		if( MESSAGES ) std::cout << ">> copy assigment" << std::endl;
+		if( MESSAGES ) std::cout << ">> copy assigment ( ID" << _id << " = ID" <<  other.id() << ")" << std::endl;
 	}
 
 	instantation_profiler& operator=( instantation_profiler&& )
