@@ -17,6 +17,9 @@
 #include <functional>
 
 
+/* Simple C++11 (move semantincs aware) instantation instrumentation utility */
+
+
 template<typename T , bool MESSAGES = true>
 class instantation_profiler
 {
@@ -25,7 +28,7 @@ private:
 	                   _ctor , _copy_ctor , _move_ctor ,
 	                   _copy_assign , _move_assign;
 
-    std::size_t _id;
+    std::size_t _id; //Si no tuviera id, se aplicaba la empty base class optimization y todos contentos, como si nada hubiera pasado.
 
 public:
 	instantation_profiler() : _id( _instanced )
@@ -34,7 +37,7 @@ public:
 		_instanced++;
 		_ctor++;
 
-		if( MESSAGES ) std::cout << ">> construction" << std::endl;
+		if( MESSAGES ) std::cout << ">> construction (ID" << _id << ")" << std::endl;
 	}
 
 	instantation_profiler( const instantation_profiler& other ) : _id( _instanced )
@@ -43,16 +46,16 @@ public:
 		_instanced++;
 		_copy_ctor++;
 
-		if( MESSAGES ) std::cout << ">> copy construction (" << _id << " <== ID" << other.id() << ")" << std::endl;
+		if( MESSAGES ) std::cout << ">> copy construction (ID" << _id << " <== ID" << other.id() << ")" << std::endl;
 	}
 
-	instantation_profiler( instantation_profiler&& ) : _id( _instanced )
+	instantation_profiler( instantation_profiler&& other ) : _id( _instanced )
 	{
 		_alive++;
 		_instanced++;
 		_move_ctor++;
 
-		if( MESSAGES ) std::cout << ">> move construction" << std::endl;
+		if( MESSAGES ) std::cout << ">> move construction (ID" << _id << " <-- ID" << other.id() << ")" << std::endl;
 	}
 
 	instantation_profiler& operator=( const instantation_profiler& other )
@@ -62,11 +65,11 @@ public:
 		if( MESSAGES ) std::cout << ">> copy assigment ( ID" << _id << " = ID" <<  other.id() << ")" << std::endl;
 	}
 
-	instantation_profiler& operator=( instantation_profiler&& )
+	instantation_profiler& operator=( instantation_profiler&& other )
 	{
 		_move_assign++;
 
-		if( MESSAGES ) std::cout << ">> move assigment" << std::endl;
+		if( MESSAGES ) std::cout << ">> move assigment ( ID" << _id << " = ID" <<  other.id() << ")" << std::endl;
 	}
 
 	~instantation_profiler()
@@ -74,10 +77,15 @@ public:
 		_alive--;
 		_destroyed++;
 
-		if( MESSAGES ) std::cout << ">> destruction" << std::endl;
+		if( MESSAGES ) std::cout << ">> destruction (ID" << _id << ")" << std::endl;
 	}
 
+    
 
+    std::size_t id() const
+    {
+        return _id;
+    }
 
 	static std::size_t alive_instances()
 	{
@@ -239,7 +247,7 @@ int main()
 	std::cout << std::endl << "Just before g2( const foo& ) call with rvalue arg ( g2( f() ) )"                        << std::endl;     g2( f() );
 	std::cout << std::endl << "Just before g2( const foo& ) call with lvalue ==> rvalue arg ( g2( std::move( b ) ) )"  << std::endl;     g2( std::move( b ) );
 
-  //std::cout << std::endl << "Just before g3( foo&& ) call with lvalue arg ( g3( c ) )"                         << std::endl;           g3( c );
+  //std::cout << std::endl << "Just before g3( foo&& ) call with lvalue arg ( g3( c ) )"                         << std::endl;           g3( c ); (Por supuesto no tiene sentido. Lo pongo por coherencia)
 	std::cout << std::endl << "Just before g3( foo&& ) call with rvalue arg ( g3( f() ) )"                       << std::endl;           g3( f() );
 	std::cout << std::endl << "Just before g3( foo&& ) call with lvalue ==> rvalue arg ( g3( std::move( c ) ) )" << std::endl;           g3( std::move( c ) );
 
