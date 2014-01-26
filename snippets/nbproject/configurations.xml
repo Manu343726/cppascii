@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configurationDescriptor version="90">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
-    <logicalFolder name="f1" displayName="examples" projectFiles="true" kind="ROOT">
+    <logicalFolder name="f1" displayName="examples" projectFiles="true">
       <itemPath>aabb_2d.h</itemPath>
       <itemPath>aabb_3d.h</itemPath>
       <itemPath>math_2d.h</itemPath>
@@ -17,6 +17,7 @@
       <itemPath>main.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="HeaderFiles" displayName="utils" projectFiles="true">
+      <itemPath>make_unique.hpp</itemPath>
       <itemPath>numeric_comparisons.hpp</itemPath>
       <itemPath>operators.h</itemPath>
       <itemPath>to_string.hpp</itemPath>
@@ -52,6 +53,8 @@
       <item path="aabb_3d.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="make_unique.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="math_2d.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -92,6 +95,8 @@
       <item path="aabb_3d.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="make_unique.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="math_2d.h" ex="false" tool="3" flavor2="0">
       </item>
