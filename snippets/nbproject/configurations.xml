@@ -17,6 +17,8 @@
       <itemPath>main.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="HeaderFiles" displayName="utils" projectFiles="true">
+      <itemPath>bind.hpp</itemPath>
+      <itemPath>event.hpp</itemPath>
       <itemPath>make_unique.hpp</itemPath>
       <itemPath>numeric_comparisons.hpp</itemPath>
       <itemPath>operators.h</itemPath>
@@ -51,6 +53,10 @@
       <item path="aabb_2d.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="aabb_3d.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="bind.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="event.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -93,6 +99,10 @@
       <item path="aabb_2d.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="aabb_3d.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="bind.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="event.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
       </item>

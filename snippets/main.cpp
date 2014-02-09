@@ -11,29 +11,41 @@
 * http://www.wtfpl.net/  and the COPYING file for more details.             *
 ****************************************************************************/
 
-#define USE_BITWISE_COMPARISON
-#include "numeric_comparisons.hpp"
-#include "value_wrapper.hpp"
+#include "bind.hpp"
+#include "event.hpp"
 
+#include "Turbo/to_string.hpp"
+
+#include <functional>
 #include <iostream>
+
+void f( int a , int b , int c , int d , int e , int f , int g , int h )
+{
+    std::cout << a << " " << b << " " << c << " " << d << " " << e << " " << f << " " << g << " " << h  << std::endl;
+}
+
+void g(cpp::no_sender& , char&){}
+
+struct foo
+{
+    void f(cpp::no_sender& , char&) {}
+};
 
 int main()
 {
-    float pi( 3.141592654f ) , pi2( pi );
+    using namespace std::placeholders;
     
-    for( std::size_t i = 0 ; i < 100 ; ++i )
-        pi2 += 0.001;
+    foo my_foo;
+    auto event = cpp::make_event( g );
     
-    for( std::size_t i = 0 ; i < 100 ; ++i )
-        pi2 -= 0.001;
+    event.add_handler( my_foo , &foo::f );
     
-    std::cout << std::boolalpha; //Que pinte true y false por dios
+    auto f_call = cpp::bind( f , cpp::generate_placeholders<1,7>{} , 1);
+    auto std_f_call = std::bind( f , _1 , 9 , _3 , _4 , _5 , _6 , _7 , _8 );
     
-    std::cout << ( 2*pi2 - pi2 == pi ) << std::endl; //Ya os digo yo que ni de coña este es true
-    std::cout << cpp::numeric_comparisons::equal( 2*pi - pi , pi ) << std::endl; //Pero este si
-    std::cout << ( cpp::wrap( 2*pi2 - pi ) == cpp::wrap( pi ) ) << std::endl; //Mucho más intuitivo de usar, verdad?
-    std::cout << ( cpp::wrap( 2*pi2 - pi ) != cpp::wrap( pi ) ) << std::endl; //Mucho más intuitivo de usar, verdad?
-    std::cout << ( cpp::wrap( 2*pi2 - pi ) >= cpp::wrap( pi ) ) << std::endl; //Mucho más intuitivo de usar, verdad?
-    std::cout << ( cpp::wrap( 2*pi2 - pi ) <= cpp::wrap( pi ) ) << std::endl; //Mucho más intuitivo de usar, verdad?
+    std::cout << tml::to_string<decltype(f_call)>() << std::endl;
+    
+    f_call( 2 , 3 , 4 , 5 , 6 , 7 , 8 );
+    std_f_call( 1 , 2 , 3 , 4 , 5 , 6 , 7 , 8 );
 }
 
