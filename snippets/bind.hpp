@@ -21,21 +21,7 @@
 #include "Turbo/for_loops.hpp"
 #include "Turbo/numeric_iterators.hpp"
 #include "Turbo/list.hpp"
-
-namespace cpp
-{
-    namespace bind_impl
-    {
-        template<typename N>
-        struct custom_placeholder{};
-    }
-}
-
-namespace std
-{
-    template<int N>
-    struct is_placeholder<cpp::bind_impl::custom_placeholder<tml::integer<N>>> : std::integral_constant<int,N> {};
-} 
+#include "Turbo/utility.hpp"
 
 namespace cpp
 {
@@ -49,12 +35,66 @@ namespace cpp
     
     template<int... PLACEHOLDERS>
     using placeholders = cpp::placeholders_list<tml::integer<PLACEHOLDERS>...>;
-
     
-    template<typename F, typename... ARGS , typename... INDICES>
-    auto bind( F&& function , cpp::placeholders_list<INDICES...> placeholders , ARGS&&... args ) -> decltype( std::bind( std::forward<F>( function ) , std::forward<ARGS>( args )... , cpp::bind_impl::custom_placeholder<INDICES>{}... ) )
+    
+    
+    namespace bind_impl
+    {
+        template<typename N>
+        struct custom_placeholder{};
+        
+        template<typename N>
+        using integer_secuence = tml::for_each<tml::make_integer_forward_iterator<0> , tml::make_integer_forward_iterator<N::value> , tml::function>;
+        
+        //bypass base case:
+        std::tuple<> bypass()
+        {
+            return std::make_tuple();
+        }
+        
+        //Non-placeholder bypass:
+        template<typename HEAD , typename... TAIL>
+        auto bypass( HEAD&& head , TAIL&&... tail )
+        {
+            return std::tuple_cat( std::make_tuple( std::forward<HEAD>( head ) ) , 
+                                   cpp::bind_impl::bypass( std::forward<TAIL>( tail )... )
+                                 );
+        }
+        
+        //Placeholder bypass:
+        template<typename... INDICES , typename... TAIL>
+        auto bypass( cpp::placeholders_list<INDICES...>&& , TAIL&&... tail )
+        {
+            return std::tuple_cat( std::make_tuple( cpp::bind_impl::custom_placeholder<INDICES>{}... ) ,
+                                   cpp::bind_impl::bypass( std::forward<TAIL>( tail )... )
+                                 );
+        }
+        
+        template<typename F , typename... ARGS , typename... INDICES>
+        auto bind_impl( F&& function , const std::tuple<ARGS...>& args , tml::list<INDICES...>&& )
+        {
+            static_assert( sizeof...(INDICES) == sizeof...(ARGS) , "Something gone very wrong..." );
+            
+            return std::bind( std::forward<F>( function ) , std::get<INDICES::value>( args )... );
+        }
+    }
+}
+
+namespace std
+{
+    template<int N>
+    struct is_placeholder<cpp::bind_impl::custom_placeholder<tml::integer<N>>> : std::integral_constant<int,N> {};
+} 
+
+namespace cpp
+{    
+    template<typename F, typename... ARGS>
+    auto bind( F&& function , ARGS&&... args )
     {   
-        return std::bind( std::forward<F>( function ) , std::forward<ARGS>( args )... , cpp::bind_impl::custom_placeholder<INDICES>{}... );
+        return cpp::bind_impl::bind_impl( std::forward<F>( function ) , 
+                                          cpp::bind_impl::bypass( std::forward<ARGS>( args )... ), 
+                                          cpp::bind_impl::integer_secuence<std::tuple_size<decltype( cpp::bind_impl::bypass( std::forward<ARGS>( args )... ) )>>{} 
+                                        );
     }
 }
 

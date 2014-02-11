@@ -12,7 +12,6 @@
 ****************************************************************************/
 
 #include "bind.hpp"
-#include "event.hpp"
 
 #include "Turbo/to_string.hpp"
 
@@ -24,11 +23,11 @@ void f( int a , int b , int c , int d , int e , int f , int g , int h )
     std::cout << a << " " << b << " " << c << " " << d << " " << e << " " << f << " " << g << " " << h  << std::endl;
 }
 
-void g(cpp::no_sender& , char&){}
+void g(int,bool,char){}
 
 struct foo
 {
-    void f(cpp::no_sender& , char&) {}
+    void f(int,bool,char) {}
 };
 
 int main()
@@ -36,11 +35,8 @@ int main()
     using namespace std::placeholders;
     
     foo my_foo;
-    auto event = cpp::make_event( g );
     
-    event.add_handler( my_foo , &foo::f );
-    
-    auto f_call = cpp::bind( f , cpp::generate_placeholders<1,7>{} , 1);
+    auto f_call = cpp::bind( f , cpp::placeholders<1,2,3,4,5,6,7,8>{} );
     auto std_f_call = std::bind( f , _1 , 9 , _3 , _4 , _5 , _6 , _7 , _8 );
     
     std::cout << tml::to_string<decltype(f_call)>() << std::endl;

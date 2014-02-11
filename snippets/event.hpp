@@ -43,7 +43,11 @@ namespace cpp
         {
             using namespace std::placeholders;
             
-            _handlers.push_back( cpp::bind( member_function , cpp::generate_placeholders<2,sizeof...(ARGS)+1>{} , std::ref( object_ref ) ) );
+            constexpr std::size_t handler_args_count = 1 + sizeof...(ARGS);
+            
+            handler_function_t handler = cpp::bind( member_function , cpp::generate_placeholders<2,handler_args_count>{} , std::ref( object_ref ) );
+            
+            _handlers.push_back( handler );
         }
     
         void remove_handler( const handler_function_t& handler )
