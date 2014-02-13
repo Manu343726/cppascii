@@ -5,6 +5,7 @@
       <itemPath>aabb_2d.h</itemPath>
       <itemPath>aabb_3d.h</itemPath>
       <itemPath>math_2d.h</itemPath>
+      <itemPath>polinomial.hpp</itemPath>
       <itemPath>vector_3d.hpp</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
@@ -21,7 +22,7 @@
       <itemPath>event.hpp</itemPath>
       <itemPath>make_unique.hpp</itemPath>
       <itemPath>numeric_comparisons.hpp</itemPath>
-      <itemPath>operators.h</itemPath>
+      <itemPath>operators.hpp</itemPath>
       <itemPath>to_string.hpp</itemPath>
       <itemPath>value_wrapper.hpp</itemPath>
     </logicalFolder>
@@ -66,7 +67,9 @@
       </item>
       <item path="numeric_comparisons.hpp" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="operators.h" ex="false" tool="3" flavor2="0">
+      <item path="operators.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="polinomial.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="to_string.hpp" ex="false" tool="3" flavor2="0">
       </item>
@@ -112,7 +115,9 @@
       </item>
       <item path="numeric_comparisons.hpp" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="operators.h" ex="false" tool="3" flavor2="0">
+      <item path="operators.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="polinomial.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="to_string.hpp" ex="false" tool="3" flavor2="0">
       </item>
