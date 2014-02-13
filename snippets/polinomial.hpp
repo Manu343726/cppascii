@@ -5,6 +5,8 @@
 #include "operators.hpp"
 #include "value_wrapper.hpp"
 
+#include "Turbo/core.hpp"
+
 #include <vector>
 #include <cmath>
 
@@ -92,10 +94,14 @@ namespace cpp
     
     namespace polinomial_grammar
     {
+        
+        
+        
+        
         template<typename T>
         struct child_node
         {
-            const T& node;
+            T node;
             
             child_node( const T& _node ) :
                 node( _node ) 
@@ -113,8 +119,8 @@ namespace cpp
         template<typename LHS , typename RHS>
         struct addition_op
         {
-            const LHS& lhs;
-            const RHS& rhs;
+            LHS lhs;
+            RHS rhs;
             
             addition_op( const LHS& _lhs , const RHS& _rhs ) :
                 lhs( _lhs ) , 
@@ -145,8 +151,8 @@ namespace cpp
         template<typename LHS , typename RHS>
         struct substraction_op
         {
-            const LHS& lhs;
-            const RHS& rhs;
+            LHS lhs;
+            RHS rhs;
             
             substraction_op(const LHS& _lhs , const RHS& _rhs ) :
                 lhs( _lhs ) , 
@@ -175,6 +181,18 @@ namespace cpp
         };
         
         
+        //Un poco de ayuda para la resolución de sobrecargas:
+        
+        TURBO_DEFINE_FUNCTION( is_operator , (typename T) , (T) , (tml::false_type) );
+        
+        template<typename LHS , typename RHS>
+        struct is_operator_t<addition_op<LHS,RHS>>     : public tml::function<tml::true_type> {};
+        
+        template<typename LHS , typename RHS>
+        struct is_operator_t<substraction_op<LHS,RHS>> : public tml::function<tml::true_type> {};
+        
+        //Sobrecarga de operadores:
+        
         //monomio + número
         addition_op<child_node<cpp::monomial>,child_node<float>> operator+( const cpp::monomial& lhs , const float& rhs )
         {
@@ -187,12 +205,89 @@ namespace cpp
             return { child_node<cpp::monomial>{ lhs } , child_node<cpp::monomial>{ rhs } };
         }
         
-        
-        
-        template<typename RHS>
-        substraction_op<child_node<cpp::monomial>,child_node<RHS>> operator-( const cpp::monomial& m , const RHS& rhs )
+        //monomio + operador binario
+        template<typename OP , typename = typename std::enable_if<is_operator<OP>::value>::type>
+        addition_op<child_node<cpp::monomial>,OP> operator+( const cpp::monomial& lhs , const OP& rhs )
         {
-            return { child_node<cpp::monomial>{ m } , child_node<RHS>{ rhs } };
+            return { child_node<cpp::monomial>{ lhs } , rhs };
+        }
+        
+        //operador binario + monomio
+        template<typename OP , typename = typename std::enable_if<is_operator<OP>::value>::type>
+        addition_op<OP,child_node<cpp::monomial>> operator+( const OP& lhs , const cpp::monomial& rhs )
+        {
+            return { lhs , child_node<cpp::monomial>{ rhs } };
+        }
+        
+        //múmero + operador binario
+        template<typename OP , typename = typename std::enable_if<is_operator<OP>::value>::type>
+        addition_op<child_node<float>,OP> operator+( const float& lhs , const OP& rhs )
+        {
+            return { child_node<float>{ lhs } , rhs };
+        }
+        
+        //operador binario + número
+        template<typename OP , typename = typename std::enable_if<is_operator<OP>::value>::type>
+        addition_op<OP,child_node<float>> operator+( const OP& lhs , const float& rhs )
+        {
+            return { lhs , child_node<float>{ rhs } };
+        }
+        
+        //operador binario + operador binario
+        template<typename OP1 , typename OP2 , 
+                 typename = typename std::enable_if<is_operator<OP1>::value && is_operator<OP2>::value>::type>
+        addition_op<OP1,OP2> operator+( const OP1& lhs , const OP2& rhs )
+        {
+            return { lhs , rhs };
+        }
+        
+        
+        //monomio - número
+        substraction_op<child_node<cpp::monomial>,child_node<float>> operator-( const cpp::monomial& lhs , const float& rhs )
+        {
+            return { child_node<cpp::monomial>{ lhs } , child_node<float>{ rhs } };
+        }
+        
+        //monomio - monomio
+        substraction_op<child_node<cpp::monomial>,child_node<cpp::monomial>> operator-( const cpp::monomial& lhs , const cpp::monomial& rhs )
+        {
+            return { child_node<cpp::monomial>{ lhs } , child_node<cpp::monomial>{ rhs } };
+        }
+        
+        //monomio - operador binario
+        template<typename OP , typename = typename std::enable_if<is_operator<OP>::value>::type>
+        substraction_op<child_node<cpp::monomial>,OP> operator-( const cpp::monomial& lhs , const OP& rhs )
+        {
+            return { child_node<cpp::monomial>{ lhs } , rhs };
+        }
+        
+        //operador binario - monomio
+        template<typename OP , typename = typename std::enable_if<is_operator<OP>::value>::type>
+        substraction_op<OP,child_node<cpp::monomial>> operator-( const OP& lhs , const cpp::monomial& rhs )
+        {
+            return { lhs , child_node<cpp::monomial>{ rhs } };
+        }
+        
+        //múmero - operador binario
+        template<typename OP , typename = typename std::enable_if<is_operator<OP>::value>::type>
+        substraction_op<child_node<float>,OP> operator-( const float& lhs , const OP& rhs )
+        {
+            return { child_node<float>{ lhs } , rhs };
+        }
+        
+        //operador binario - número
+        template<typename OP , typename = typename std::enable_if<is_operator<OP>::value>::type>
+        substraction_op<OP,child_node<float>> operator-( const OP& lhs , const float& rhs )
+        {
+            return { lhs , child_node<float>{ rhs } };
+        }
+        
+        //operador binario - operador binario
+        template<typename OP1 , typename OP2 , 
+                 typename = typename std::enable_if<is_operator<OP1>::value && is_operator<OP2>::value>::type>
+        substraction_op<OP1,OP2> operator-( const OP1& lhs , const OP2& rhs )
+        {
+            return { lhs , rhs };
         }
     }
 }

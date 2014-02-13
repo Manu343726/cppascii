@@ -13,9 +13,6 @@
 
 #include "polinomial.hpp"
 
-#include "Turbo/to_string.hpp"
-
-#include <functional>
 #include <iostream>
 
 int main()
@@ -23,7 +20,7 @@ int main()
     using namespace cpp::polinomial_symbols;
     using namespace cpp::polinomial_grammar;
     
-    cpp::polinomial p = (3*X^2) + X;
+    cpp::polinomial p = (3*X^3) + (2*X^2) - (X) + 1;
     
     std::cout << p(1) << std::endl;
 }
