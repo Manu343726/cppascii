@@ -12,8 +12,11 @@
 ****************************************************************************/
 
 #include "polinomial.hpp"
+#include "string.hpp"
 
 #include <iostream>
+#include <algorithm>
+#include <iterator>
 
 int main()
 {
@@ -23,6 +26,18 @@ int main()
     cpp::polinomial p = (3*X^3) + (2*X^2) - (X) + 1;
     
     std::cout << p(1) << std::endl;
+
+    
+    
+   
+    cpp::string str = "hola!";
+    
+    std::copy( std::begin( str ) , std::end( str ) , std::ostream_iterator<char>( std::cout ) );
+    std::cout << std::endl;
+    
+    cpp::string str2 = std::move( str );
+    
+    std::swap( str , str2 );
 }
 
 

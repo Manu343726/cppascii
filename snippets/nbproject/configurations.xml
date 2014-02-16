@@ -6,6 +6,7 @@
       <itemPath>aabb_3d.h</itemPath>
       <itemPath>math_2d.h</itemPath>
       <itemPath>polinomial.hpp</itemPath>
+      <itemPath>string.hpp</itemPath>
       <itemPath>vector_3d.hpp</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
@@ -20,6 +21,7 @@
     <logicalFolder name="HeaderFiles" displayName="utils" projectFiles="true">
       <itemPath>bind.hpp</itemPath>
       <itemPath>event.hpp</itemPath>
+      <itemPath>instantation_profiler.hpp</itemPath>
       <itemPath>make_unique.hpp</itemPath>
       <itemPath>numeric_comparisons.hpp</itemPath>
       <itemPath>operators.hpp</itemPath>
@@ -59,6 +61,8 @@
       </item>
       <item path="event.hpp" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="instantation_profiler.hpp" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="make_unique.hpp" ex="false" tool="3" flavor2="0">
@@ -70,6 +74,8 @@
       <item path="operators.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="polinomial.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="string.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="to_string.hpp" ex="false" tool="3" flavor2="0">
       </item>
@@ -107,6 +113,8 @@
       </item>
       <item path="event.hpp" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="instantation_profiler.hpp" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="make_unique.hpp" ex="false" tool="3" flavor2="0">
@@ -118,6 +126,8 @@
       <item path="operators.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="polinomial.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="string.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="to_string.hpp" ex="false" tool="3" flavor2="0">
       </item>
