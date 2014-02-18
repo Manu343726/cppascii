@@ -18,6 +18,8 @@
 #include <utility>
 #include <functional>
 
+#include "Turbo/to_string.hpp"
+
 
 /* Simple C++11 (move semantincs aware) instantation instrumentation utility */
 
@@ -228,9 +230,14 @@ void h( T&& afoo )
     scoped_call chapuza( [](){ std::cout << "Exiting h()..." << std::endl; } );
 
     std::cout << "I'm in h(), which sends a foo to g() through perfect forwarding!" << std::endl;
+    std::cout << "The type of the forwarded parameter is " << tml::to_string<decltype( afoo )>() << std::endl;
 
     g1( std::forward<T>( afoo ) );
 }
+
+
+//Podría haberlo escrito usando una macro, pero odio el CPP:
+#define EXAMPLE( message , code ) std::cout << std::endl << message << " ( " << #code << " )" << std::endl; code
 
 
 int main()
