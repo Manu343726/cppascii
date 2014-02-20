@@ -45,7 +45,7 @@ namespace cpp
             
             constexpr std::size_t handler_args_count = 1 + sizeof...(ARGS);
             
-            handler_function_t handler = cpp::bind( member_function , cpp::generate_placeholders<2,handler_args_count>{} , std::ref( object_ref ) );
+            handler_function_t handler = cpp::bind( member_function , std::ref( object_ref ) , cpp::generate_placeholders<1,handler_args_count>{} );
             
             _handlers.push_back( handler );
         }
@@ -88,7 +88,7 @@ namespace cpp
     template<typename FUNCTION>
     cpp::event_maker_helper<FUNCTION> make_event( const FUNCTION& function )
     {
-        return cpp::event_maker_helper<FUNCTION>();
+        return cpp::event_maker_helper<FUNCTION>{};
     }
 }
 
