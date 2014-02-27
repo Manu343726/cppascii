@@ -56,9 +56,16 @@ namespace cpp
     public:
         template<typename... ARGS>
         scoped_resource( end_scope_action_t action , ARGS&&... args ) : 
-            _resource( std::forward<ARGS>( args )... ) ,
-            _end_scope_action( action )
+            _resource{ std::forward<ARGS>( args )... } ,
+            _end_scope_action{ action }
         {}
+
+        scoped_resource( end_scope_action_t init, end_scope_action_t destroy ) :
+            _resource{},
+            _end_scope_action{destroy}
+        {
+            init(_resource);
+        }
         
         const T& ref() const
         {
