@@ -98,7 +98,7 @@ namespace cpp
         
         
 #ifndef USE_COPY_AND_SWAP
-        ctor para rvalues: Te robo lo tuyo y tu te quedas sin nada (Move semantics)
+        //ctor para rvalues: Te robo lo tuyo y tu te quedas sin nada (Move semantics)
         basic_string(basic_string&& other )
         {
             _data = other._data;
@@ -178,7 +178,7 @@ namespace cpp
         //Aquí uso el convenio de la biblioteca estandar: [] no chequea, at() si:
         
         //Sobrecarga para lectura:
-        value_type operator[]( std::size_t index ) const
+        const value_type& operator[]( std::size_t index ) const
         {
             return _data[index];
         }
@@ -186,7 +186,7 @@ namespace cpp
         //Sobrecarga para escritura:
         value_type& operator[]( std::size_t index )
         {
-            return _data[index];
+            return static_cast<value_type&>( (*this)[index] );
         }
         
         //Sobrecagra para lectura:
@@ -216,33 +216,38 @@ namespace cpp
                 _str( str_ref ) ,
                 _index( index )
             {}
-            
+
+            //Desreferenciar el "puntero" (Iterador): Leer el caracter de la cadea en el que estamos
             value_type& operator*()
             {
                 return _str.get()[_index];
             }
             
+            //Lo mismo, pero para lectura
             value_type operator*() const
             {
                 return _str.get()[_index];
             }
             
+            //Avanzar "puntero" (iterador)
             void operator++()
             {
-                _index++;
+                ++_index;
             }
             
+            //Retroceder "puntero" (iterador)
             void operator--()
             {
-                _index--;
+                --_index;
             }
             
-            
+            //Comparación de iteradores
             friend bool operator==( const iterator& lhs , const iterator& rhs )
             {
                 return lhs._index == rhs._index;
             }
             
+            //Comparación de iteradores
             friend bool operator>( const iterator& lhs , const iterator& rhs )
             {
                 return lhs._index > rhs._index;

@@ -4,7 +4,9 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
+      <itemPath>fireworks.hpp</itemPath>
       <itemPath>particle.hpp</itemPath>
+      <itemPath>particle_policies.hpp</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
@@ -49,9 +51,13 @@
           </linkerLibItems>
         </linkerTool>
       </compileType>
+      <item path="fireworks.hpp" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="particle.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="particle_policies.hpp" ex="false" tool="3" flavor2="0">
       </item>
     </conf>
     <conf name="Release" type="1">
@@ -84,9 +90,13 @@
           </linkerLibItems>
         </linkerTool>
       </compileType>
+      <item path="fireworks.hpp" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="particle.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="particle_policies.hpp" ex="false" tool="3" flavor2="0">
       </item>
     </conf>
   </confs>
