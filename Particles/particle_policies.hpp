@@ -127,6 +127,11 @@ namespace cpp
         {
             if( is_alive() ) _life_ahead--;
         }
+        
+        void respawn() 
+        {
+            _life_ahead = _lifetime;
+        }
     };
     
     

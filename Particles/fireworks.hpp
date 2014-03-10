@@ -85,7 +85,7 @@ namespace cpp
             }
             
             //Al morir se vuelvem magenta:
-            void death_policy( DATA& particle_data ) const
+            void death_policy( DATA& particle_data )
             {
                 //std::cout << "A particle is dying..." << std::endl;
                 
@@ -94,6 +94,13 @@ namespace cpp
                 //Siento si soy brusco, pero: QUIEN PONGA UN IF AQUÍ PARA NO MULTIPLICAR TODO EL RATO UNA VEZ QUE LA
                 //PARTÍCULA MUERTA HA PARADO NO TIENE NI PUTA IDEA NI DE PROGRAMAR NI DE COMO FUNCIONA EL HARDWARE HOY EN DÍA
                 particle_data.speed() *= 0.0f; //Los muertos no se mueven!
+                
+                this->respawn();
+                 
+                std::uniform_real_distribution<float> dist_x{ 100.0f , 700.0f } , dist_y{ 100.0f , 500.0f };
+                
+                begin.x = dist_x( prng );
+                begin.y = dist_y( prng );
             }
             
             //Cuando son "niñas" (Primer tercio de su vida) son rojas:
