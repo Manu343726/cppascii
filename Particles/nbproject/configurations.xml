@@ -4,9 +4,15 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
+      <itemPath>bounded.hpp</itemPath>
       <itemPath>fireworks.hpp</itemPath>
+      <itemPath>lifetime_evolution_policies.hpp</itemPath>
       <itemPath>particle.hpp</itemPath>
+      <itemPath>particle_data_policies.hpp</itemPath>
+      <itemPath>particle_drawing_policies.hpp</itemPath>
+      <itemPath>particle_evolution_policies.hpp</itemPath>
       <itemPath>particle_policies.hpp</itemPath>
+      <itemPath>space_evolution_policies.hpp</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
@@ -51,13 +57,25 @@
           </linkerLibItems>
         </linkerTool>
       </compileType>
+      <item path="bounded.hpp" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="fireworks.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="lifetime_evolution_policies.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="particle.hpp" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="particle_data_policies.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="particle_drawing_policies.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="particle_evolution_policies.hpp" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="particle_policies.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="space_evolution_policies.hpp" ex="false" tool="3" flavor2="0">
       </item>
     </conf>
     <conf name="Release" type="1">
@@ -89,14 +107,38 @@
             <linkerLibLibItem>sfml-window</linkerLibLibItem>
           </linkerLibItems>
         </linkerTool>
+        <requiredProjects>
+          <makeArtifact PL="../snippets"
+                        CT="1"
+                        CN="Debug"
+                        AC="true"
+                        BL="false"
+                        WD="../snippets"
+                        BC="${MAKE}  -f Makefile CONF=Debug"
+                        CC="${MAKE}  -f Makefile CONF=Debug clean"
+                        OP="${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/snippets">
+          </makeArtifact>
+        </requiredProjects>
       </compileType>
+      <item path="bounded.hpp" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="fireworks.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="lifetime_evolution_policies.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="particle.hpp" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="particle_data_policies.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="particle_drawing_policies.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="particle_evolution_policies.hpp" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="particle_policies.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="space_evolution_policies.hpp" ex="false" tool="3" flavor2="0">
       </item>
     </conf>
   </confs>

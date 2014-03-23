@@ -19,12 +19,14 @@
       <itemPath>main.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="HeaderFiles" displayName="utils" projectFiles="true">
+      <itemPath>binary_literals.hpp</itemPath>
       <itemPath>bind.hpp</itemPath>
       <itemPath>event.hpp</itemPath>
       <itemPath>instantation_profiler.hpp</itemPath>
       <itemPath>make_unique.hpp</itemPath>
       <itemPath>numeric_comparisons.hpp</itemPath>
       <itemPath>operators.hpp</itemPath>
+      <itemPath>polymorphism.hpp</itemPath>
       <itemPath>to_string.hpp</itemPath>
       <itemPath>value_wrapper.hpp</itemPath>
     </logicalFolder>
@@ -57,6 +59,8 @@
       </item>
       <item path="aabb_3d.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="binary_literals.hpp" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="bind.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="event.hpp" ex="false" tool="3" flavor2="0">
@@ -74,6 +78,8 @@
       <item path="operators.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="polinomial.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="polymorphism.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="string.hpp" ex="false" tool="3" flavor2="0">
       </item>
@@ -109,6 +115,8 @@
       </item>
       <item path="aabb_3d.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="binary_literals.hpp" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="bind.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="event.hpp" ex="false" tool="3" flavor2="0">
@@ -126,6 +134,8 @@
       <item path="operators.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="polinomial.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="polymorphism.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="string.hpp" ex="false" tool="3" flavor2="0">
       </item>

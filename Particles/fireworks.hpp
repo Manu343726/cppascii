@@ -15,9 +15,14 @@
 #define	FIREWORKS_HPP
 
 #include "particle_policies.hpp"
-#include <random>
-#include <SFML/Graphics.hpp>
+#include "particle_data_policies.hpp"
+#include "lifetime_evolution_policies.hpp"
+#include "space_evolution_policies.hpp"
+#include "particle_drawing_policies.hpp"
 
+#include "../snippets/math_2d.h"
+
+#include <random>
 #include <iostream>
 
 using namespace std::placeholders;
@@ -30,7 +35,7 @@ namespace cpp
         class firework_lifetime_policy : public cpp::lifetime_policy<cpp::particle_birth_action<DATA> , cpp::segmented_life_policy<DATA> , cpp::particle_death_action<DATA>>
         {
         private:
-            sf::Vector2f begin;
+            dl32::vector_2df begin;
             float init_speed , grow , degrow;
             
             std::mt19937 prng;
@@ -43,7 +48,7 @@ namespace cpp
             
         public:
             
-            firework_lifetime_policy( int lifetime , const sf::Vector2f begin_ , float speed , float grow_ , float degrow_ ,
+            firework_lifetime_policy( int lifetime , const dl32::vector_2df begin_ , float speed , float grow_ , float degrow_ ,
                                       float end_child = 0.3f , float end_adult = 0.6f) :
                 lifetime_policy_type //Inicializamos la política subyacente (tiempo de vida, políticas de nacimiento, vida, y muerte)
                 {
@@ -125,28 +130,35 @@ namespace cpp
             }
         };
         
-        
+        using lifetime_policy = std::reference_wrapper<cpp::fireworks::firework_lifetime_policy<cpp::default_particle_data_holder>>;
         
         //Una partícula de nuestro sistema de fuegos artificiales es una partícula que usa como política la política
         //del sistema de fuegos artificiales (Valga la redundancia...):
-        struct particle : public cpp::policied_particle<cpp::default_particle_data_holder,cpp::fireworks::firework_lifetime_policy<cpp::default_particle_data_holder>>
+        struct particle : public cpp::policied_particle<cpp::default_particle_data_holder,
+                                                        cpp::fireworks::lifetime_policy,
+                                                        cpp::pixel_particle_drawing_policy>
         {
-            using lifetime_policy = cpp::fireworks::firework_lifetime_policy<cpp::default_particle_data_holder>;
+            using base = cpp::policied_particle<cpp::default_particle_data_holder,
+                                                        cpp::fireworks::lifetime_policy,
+                                                        cpp::pixel_particle_drawing_policy>;
             
-            particle( const std::reference_wrapper<lifetime_policy>& policy ) :
-                cpp::policied_particle<cpp::default_particle_data_holder,lifetime_policy>
+        
+            
+            particle( const cpp::fireworks::lifetime_policy& policy ) :
+                base
                 {
                     cpp::default_particle_data_holder{} , //Inicializamos los datos de la partícula por defecto
                                                           //Al fin y al cabo se van a "inicializar" cuando nazcan 
                                                           //(Ver políticas de evolución más arriba)
-                    policy
+                    policy ,
+                    cpp::pixel_particle_drawing_policy{}
                 }
             {}
         };
         
         
         //Y finalmente el motor del sistema de "fuegos artificiales":
-        struct fireworks_engine
+        struct fireworks_engine : public cpp::particle_engine
         {
         private:
             std::vector<cpp::fireworks::particle> particles_; //Conjunto de partículas
@@ -159,11 +171,11 @@ namespace cpp
             
             
         public:
-            fireworks_engine( int lifetime , const sf::Vector2f& center , float speed ) :
+            fireworks_engine( int lifetime , const dl32::vector_2df& center , float speed ) :
                 particles_lifetime_policy{ lifetime , center , speed , 1.0003f , 0.9997f } ,
-                team_a{ lifetime , center                               , speed      , 1.0003f , 0.9998f , 0.3f  , 0.6f  } ,
-                team_b{ lifetime , center + sf::Vector2f{ 1.0f , 1.0f } , speed*1.0f , 1.0006f , 0.9997f , 0.2f  , 0.24f } ,
-                team_c{ lifetime , center - sf::Vector2f{ 1.0f , 1.0f } , speed*1.1f , 1.003f  , 0.9992f , 0.04f , 0.5f  }
+                team_a{ lifetime , center                                   , speed      , 1.0003f , 0.9998f , 0.3f  , 0.6f  } ,
+                team_b{ lifetime , center + dl32::vector_2df{ 1.0f , 1.0f } , speed*1.0f , 1.0006f , 0.9997f , 0.2f  , 0.24f } ,
+                team_c{ lifetime , center - dl32::vector_2df{ 1.0f , 1.0f } , speed*1.1f , 1.003f  , 0.9992f , 0.04f , 0.5f  }
             {
                 
                 //Las partículas guardan una referencia a la política de evolución que siguen:
@@ -182,8 +194,7 @@ namespace cpp
                 
                 //Las partículas guardan una referencia a la política de evolución que siguen:
                 cpp::fireworks::particle team_c_particle{ std::ref( team_c ) };
-                particles_.insert( std::end( particles_ ) , 1000u , team_c_particle );   
-                
+                particles_.insert( std::end( particles_ ) , 1000u , team_c_particle );            
             }
                 
                 
@@ -192,26 +203,16 @@ namespace cpp
             template<typename CANVAS>
             void draw( CANVAS& canvas ) const
             {
-                static std::vector<sf::Vertex> vertices{ particles_.size() };
-                
-                std::transform( std::begin( particles_ ) , std::end( particles_ ) , std::begin( vertices ) ,
-                [](const cpp::fireworks::particle& particle ) 
-                {
-                    return particle.vertex();
-                });
-                
-                canvas.draw( vertices.data() , vertices.size() , sf::Points );
+                cpp::particle_engine::draw( particles_ , cpp::pixel_particle_drawing_policy{} , canvas );
             }
             
             void step()
             {
-                for( auto& particle : particles_ )
-                    particle.step();
-                
-                particles_lifetime_policy.step();
-                team_a.step();
-                team_b.step();
-                team_c.step();
+                cpp::particle_engine::step( particles_ , particles_lifetime_policy ,
+                                                         team_a ,
+                                                         team_b ,
+                                                         team_c 
+                                          );
             }
         };
     }

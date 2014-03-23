@@ -11,29 +11,26 @@
 * http://www.wtfpl.net/  and the COPYING file for more details.             *
 ****************************************************************************/
 
-#include "binary_literals.hpp"
-#include "Turbo/to_string.hpp"
+#ifndef POLYMORPHISM_HPP
+#define	POLYMORPHISM_HPP
 
-#include <iostream>
-#include <climits>
+#include <vector>
+#include <memory>
 
-
-int main()
+namespace cpp
 {
-    auto a = 101_b;
-    auto b = 101011010101_b;
-    auto c = 10101011010101010101010101_b;
-    auto d = 10101011100000000111101101110111011010101010000011100010101_b;
+    template<typename INTERFACE , template<typename> class GENERIC_IMPL>
+    class free_polymorphism
+    {
+        
+        
+        
+    private:
+        std::vector<std::shared_ptr<INTERFACE>> _implementers;
+    };
     
-    std::cout << (unsigned int)a << std::endl;
-    std::cout << b << std::endl;
-    std::cout << c << std::endl;
-    std::cout << d << std::endl;
     
-    std::cout << tml::to_string( a ) << "(" << sizeof(a)*CHAR_BIT << " bits)" << std::endl;
-    std::cout << tml::to_string( b ) << "(" << sizeof(b)*CHAR_BIT << " bits)" << std::endl;
-    std::cout << tml::to_string( c ) << "(" << sizeof(c)*CHAR_BIT << " bits)" << std::endl;
-    std::cout << tml::to_string( d ) << "(" << sizeof(d)*CHAR_BIT << " bits)" << std::endl;
 }
 
+#endif	/* POLYMORPHISM_HPP */
 

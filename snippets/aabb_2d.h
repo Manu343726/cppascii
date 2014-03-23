@@ -15,9 +15,29 @@
 #define AABB_2D_H
 
 #include "math_2d.h"
+#include "binary_literals.hpp"
+#include "numeric_comparisons.hpp"
+
 #include <vector>
+#include <bitset>
 
 namespace cpp {
+    
+    
+    //Check the Cohen-Sutherland clipping algorithm
+    enum class aabb_2d_area : std::uint8_t
+    {
+        inside     = 0000_b,
+        north      = 1000_b,
+        south      = 0100_b,
+        east       = 0010_b,
+        west       = 0001_b,
+        north_east = 1010_b,
+        north_west = 1001_b,
+        south_east = 0110_b,
+        south_west = 0101_b,
+        unknown    = 1111_b
+    };
 
     template<typename T>
     class aabb_2d
@@ -176,23 +196,23 @@ namespace cpp {
         }
 
         bool belongs_to(const dl32::vector_2d<T>& point) const {
-            return dl32::numeric_comparer<T>::bigger_or_equal( point.x , left()   ) &&
-                   dl32::numeric_comparer<T>::less_or_equal  ( point.x , right()  ) &&
-                   dl32::numeric_comparer<T>::bigger_or_equal( point.y , bottom() ) &&
-                   dl32::numeric_comparer<T>::less_or_equal  ( point.y , top()    );
+            return cpp::wrap( point.x ) >= cpp::wrap( left() ) &&
+                   cpp::wrap( point.x ) <= cpp::wrap( right() ) &&
+                   cpp::wrap( point.y ) >= cpp::wrap( bottom() ) &&
+                   cpp::wrap( point.y ) <= cpp::wrap( top() );
         }
-    };
-
-    //Apa�os (Simplifican las cosas):
-
-    template<typename T>
-    class aabb_2d<dl32::vector_2d<T >> : public aabb_2d<T>
-    {
-    };
-
-    template<typename T>
-    class aabb_2d<ig::entity_2d_traits<T >> : public aabb_2d<T>
-    {
+        
+        cpp::aabb_2d_area relative_position( const dl32::vector_2d<T>& point ) const
+        {
+            std::bitset<4> bits{ 0 };
+            
+            bits[3] = cpp::wrap( point.y ) > cpp::wrap( top() );
+            bits[2] = cpp::wrap( point.y ) < cpp::wrap( bottom() );
+            bits[1] = cpp::wrap( point.x ) > cpp::wrap( right() );
+            bits[0] = cpp::wrap( point.x ) < cpp::wrap( left() );
+            
+            return static_cast<cpp::aabb_2d_area>( bits.to_ulong() );
+        }
     };
 }
 

@@ -14,7 +14,7 @@
 #ifndef VECTOR_3D_HPP
 #define	VECTOR_3D_HPP
 
-#include "operators.hpp.h"
+#include "operators.hpp"
 #include "numeric_comparisons.hpp"
 
 namespace cpp

@@ -24,7 +24,7 @@
 #ifndef DL32NEWMATH_H
 #define	DL32NEWMATH_H
 
-#include "operators.hpp.h"
+#include "operators.hpp"
 #include "numeric_comparisons.hpp"
 
 #include <cmath>
