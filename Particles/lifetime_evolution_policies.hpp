@@ -40,6 +40,12 @@ namespace cpp
         LIFE life;
         DEATH death;
         
+    protected:
+        void respawn()
+        {
+            _life_ahead = _lifetime;
+        }
+        
     public:
         lifetime_policy( int lifetime = 0 , const BIRTH& birth_policy = BIRTH{} , const LIFE& life_policy = LIFE{} , const DEATH& death_policy = DEATH{} ) :
             _life_ahead{ lifetime } ,

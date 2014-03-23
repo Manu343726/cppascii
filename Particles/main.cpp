@@ -31,8 +31,8 @@ sf::RenderWindow window;
 
 
 
-cpp::fireworks::fireworks_engine engine{ 18000u , dl32::vector_2df{400.0f , 300.0f } , 0.006f };
-cpp::bounded::bounded_engine bounded_engine{ 30000u , dl32::vector_2df{400.0f , 300.0f } , 0.06f , 
+cpp::fireworks::fireworks_engine engine{ 15000u , dl32::vector_2df{400.0f , 300.0f } , 0.006f };
+cpp::bounded::bounded_engine bounded_engine{ 10000u , dl32::vector_2df{400.0f , 300.0f } , 0.06f , 
                                              cpp::aabb_2d<float>::from_coords_and_size( 0.0f , 0.0f , 800.0f , 600.0f ) 
                                            };
 
