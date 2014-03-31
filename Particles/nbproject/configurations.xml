@@ -45,6 +45,7 @@
       </toolsSet>
       <compileType>
         <ccTool>
+          <developmentMode>2</developmentMode>
           <standard>8</standard>
         </ccTool>
         <linkerTool>

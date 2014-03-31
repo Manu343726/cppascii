@@ -55,11 +55,6 @@ namespace cpp
             _evolution_policy.step( cpp::evolution_policy_step::individual );
         }
         
-        bool is_alive() const
-        {
-            return _evolution_policy.is_alive();
-        }
-        
         template<typename CANVAS>
         void draw( CANVAS& canvas ) const
         {
@@ -68,15 +63,15 @@ namespace cpp
         
     private:     
         data_policy_t      _data_policy;
-        cpp::evolution_policy<evolution_policy_t> _evolution_policy; //Type-erased evolution policy for uniform access. 
+        cpp::particle_evolution_policy<DATA_POLICY> _evolution_policy; //Type-erased evolution policy for uniform access. 
         drawing_policy_t   _drawing_policy;
         
-        using particle_size = decltype( tml::size_of<DATA_POLICY>{} + tml::size_of<EVOLUTION_POLICY>{} + tml::size_of<DRAWING_POLICY>{} );
+        //using particle_size = decltype( tml::size_of<DATA_POLICY>{} + tml::size_of<EVOLUTION_POLICY>{} + tml::size_of<DRAWING_POLICY>{} );
         
-        TURBO_ASSERT( ( tml::less_or_equal<particle_size,tml::size_t<50>> ) , "Too much fatty particle" );
+        //TURBO_ASSERT( ( tml::less_or_equal<particle_size,tml::size_t<50>> ) , "Too much fatty particle" );
     };
     
-    struct particle_engine
+    struct basic_particle_engine
     {
     private:
         void step_evolution_policies() const

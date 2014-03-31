@@ -14,18 +14,14 @@
 #ifndef LIFETIME_EVOLUTION_POLICIES_HPP
 #define	LIFETIME_EVOLUTION_POLICIES_HPP
 
+#include "particle_evolution_policies.hpp"
 
 #include <functional>
 #include <map>
 
 
 namespace cpp
-{
-    enum class evolution_policy_step
-    {
-        global , individual
-    };
-    
+{    
     /* Una partícula nace, vive, y muere: Tratamos esos tres aspectos de manera independiente. 
        Esta clase representa la política de evolución de una partícula como el agregado de las tres 
        políticas de nacimiento, vida, y muerte 

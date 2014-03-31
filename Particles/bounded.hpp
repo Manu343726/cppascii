@@ -21,13 +21,16 @@ namespace cpp
     namespace bounded
     {
         
-        using particle = cpp::policied_particle<cpp::default_particle_data_holder,
-                                                cpp::bounded_space_evolution_policy<cpp::recltangle_bounds>,
-                                                cpp::pixel_particle_drawing_policy>;
-        
-        struct bounded_engine : public cpp::particle_engine
+        struct bounded_engine : public cpp::basic_particle_engine
         {
-            bounded_engine( std::size_t particles_count , const dl32::vector_2df& begin , float speed , const cpp::aabb_2d<float>& bounds )
+            using obstacle_t = cpp::inverse_bounds<cpp::circle_bounds>;
+            using bounds_t   = cpp::rectangle_bounds;
+        
+            using particle = cpp::policied_particle<cpp::default_particle_data_holder,
+                                                    cpp::pipelined_evolution_policy<cpp::default_particle_data_holder>,
+                                                    cpp::pixel_particle_drawing_policy>;
+        
+            bounded_engine( std::size_t particles_count , const dl32::vector_2df& begin , float speed , const bounds_t& bounds , const cpp::circle_bounds& obstacle )
             {
                 std::mt19937 prng;
                 std::uniform_real_distribution<float> dist{ 0.0f , 2.0f * 3.141592654f };
@@ -37,9 +40,16 @@ namespace cpp
                     float angle = dist( prng );
                     dl32::vector_2df particle_speed{ std::cos( angle ) * speed , std::sin( angle ) * speed };
                     
-                    _particles.emplace_back( typename cpp::bounded::particle::data_policy_t{ begin , particle_speed , sf::Color::White } ,
-                                             typename cpp::bounded::particle::evolution_policy_t{ bounds } ,
-                                             typename cpp::bounded::particle::drawing_policy_t{} 
+                    cpp::pipelined_evolution_policy<cpp::default_particle_data_holder> pipeline;
+                    
+                    
+                    pipeline.add_stage( cpp::bounded_space_evolution_policy<bounds_t>{ bounds } );
+                    pipeline.add_stage( cpp::bounded_space_evolution_policy<obstacle_t>{ obstacle_t{ obstacle } } );
+                    
+                    
+                    _particles.emplace_back( typename particle::data_policy_t{ begin , particle_speed , sf::Color::White } ,
+                                             pipeline ,
+                                             typename particle::drawing_policy_t{} 
                                            );
                 }
             }
@@ -47,16 +57,16 @@ namespace cpp
             template<typename CANVAS>
             void draw( CANVAS& canvas ) const
             {
-                cpp::particle_engine::draw( _particles , cpp::pixel_particle_drawing_policy{} , canvas );
+                cpp::basic_particle_engine::draw( _particles , cpp::pixel_particle_drawing_policy{} , canvas );
             }
             
             void step()
             {
-                cpp::particle_engine::step( _particles );
+                cpp::basic_particle_engine::step( _particles );
             }
                 
         private:
-            std::vector<cpp::bounded::particle> _particles;
+            std::vector<particle> _particles;
         };
     }
 }

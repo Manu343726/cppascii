@@ -28,14 +28,23 @@
 sf::RenderWindow window;
 
 
-
+#define USE_RECTANGLE_BOUNDS
 
 
 cpp::fireworks::fireworks_engine engine{ 15000u , dl32::vector_2df{400.0f , 300.0f } , 0.006f };
-cpp::bounded::bounded_engine bounded_engine{ 10000u , dl32::vector_2df{400.0f , 300.0f } , 0.06f , 
-                                             cpp::aabb_2d<float>::from_coords_and_size( 0.0f , 0.0f , 800.0f , 600.0f ) 
-                                           };
 
+#ifdef USE_RECTANGLE_BOUNDS
+cpp::bounded::bounded_engine bounded_engine{ 10000u , dl32::vector_2df{400.0f , 300.0f } , 0.06f , 
+                                             cpp::aabb_2d<float>::from_coords_and_size( 0.0f , 0.0f , 800.0f , 600.0f ) ,
+                                             cpp::circle_bounds{ dl32::vector_2df{ 400.0f , 300.0f } , 50.0f }
+                                           };
+#else
+cpp::bounded::bounded_engine<cpp::circle_bounds> bounded_engine{ 10000u , dl32::vector_2df{400.0f , 300.0f } , 0.06f , 
+                                                                 cpp::circle_bounds{ dl32::vector_2df{ 450.0f , 350.0f } , 250.0f }
+                                                               };                
+#endif
+                                           
+                                           
 void events_loop()
 {
     sf::Event event_data;
@@ -73,7 +82,7 @@ int main()
     window.create( sf::VideoMode( 800 , 600 ) , "Particles" );
     
     std::cout << sizeof( cpp::fireworks::particle ) << std::endl;
-    std::cout << sizeof( cpp::bounded::particle ) << std::endl;
+    std::cout << sizeof( typename decltype( bounded_engine )::particle ) << std::endl;
     
     game_loop();
 }

@@ -16,117 +16,277 @@
 
 #include <functional>
 #include <memory>
-
-#include "lifetime_evolution_policies.hpp"
+#include <utility>
+#include <vector>
 
 namespace cpp
 {
-    /* Esta plantilla define un wrapper de una política de evolución a la que se le aplica type-erasure.
-       Esto permite que el usuario utilice la política directamente (POLICY) o la comparta mediante conteo de referencias
-       ( std::shared_ptr<POLICY> ) o referencias ( std::reference_wrapper<POLICY> ). */
-    
-    template<typename T>
-    class evolution_policy
+    enum class evolution_policy_step
     {
-    public:
-        template<typename... ARGS>
-        evolution_policy( ARGS&&... args ) : 
-            _policy{ std::forward<ARGS>( args )... }
-        {}
-            
-        template<typename... ARGS>
-        void operator()( ARGS&&... args ) const
-        {
-            _policy( std::forward<ARGS>( args )... );
-        }
-
-        template<typename... ARGS>
-        void operator()( ARGS&&... args )
-        {
-            _policy( std::forward<ARGS>( args )... );
-        }
-        
-        void step( cpp::evolution_policy_step step_type )
-        {
-            _policy.step( step_type );
-        }
-            
-    private:
-        T _policy;
+        global , individual
     };
     
-    template<typename T>
-    class evolution_policy<std::shared_ptr<T>>
+    template<typename PARTICLE_DATA_POLICY>
+    struct evolution_policy_traits
     {
-    public:
-        template<typename... ARGS>
-        evolution_policy( ARGS&&... args ) : 
-            _policy{ std::make_shared( std::forward<ARGS>( args )... ) }
-        {}
-            
-        template<typename... ARGS>
-        void operator()( ARGS&&... args ) const
-        {
-            (*_policy)( std::forward<ARGS>( args )... );
-        }
-
-        template<typename... ARGS>
-        void operator()( ARGS&&... args )
-        {
-            (*_policy)( std::forward<ARGS>( args )... );
-        }
+        using particle_data_policy = PARTICLE_DATA_POLICY;
         
-        void step( cpp::evolution_policy_step step_type )
-        {
-            _policy->step( step_type );
-        }
-            
-    private:
-        std::shared_ptr<T> _policy;
+        using policy_signature = std::function<void(PARTICLE_DATA_POLICY&)>;
+        using step_signature   = std::function<void(cpp::evolution_policy_step)>;
     };
     
     
-    template<typename T>
-    class evolution_policy<std::reference_wrapper<T>>
+    
+    
+    
+    
+    
+    
+    
+    /* Type-erased particle evolution policy */
+    
+    template<typename PARTICLE_DATA>
+    class particle_evolution_policy
     {
     public:
-        template<typename... ARGS>
-        evolution_policy( ARGS&&... args ) : 
-            _policy{ T{ std::forward<ARGS>( args )... } }
+        using particle_data_policy = PARTICLE_DATA;
+        
+        template<typename POLICY>
+        particle_evolution_policy( const POLICY& policy ) :
+            _policy{ std::make_shared<policy_impl<POLICY>>( policy ) }
         {}
             
-        evolution_policy( const T& ref ) :
-            _policy{ ref }
-        {}
-            
-        evolution_policy( T& ref ) :
-            _policy{ ref }
-        {}
-            
-        evolution_policy( const std::reference_wrapper<T>& ref_wrapper ) :
-            _policy{ ref_wrapper }
+        particle_evolution_policy( std::function<void(PARTICLE_DATA&)> policy ) :
+            _policy{ std::make_shared<policy_impl<std::function<void(PARTICLE_DATA&)>>>( policy ) }
         {}
         
-            
-        template<typename... ARGS>
-        void operator()( ARGS&&... args ) const
+        
+        void operator()( PARTICLE_DATA& data ) const
         {
-            _policy( std::forward<ARGS>( args )... );
+            (*_policy)( data );
         }
-
-        template<typename... ARGS>
-        void operator()( ARGS&&... args )
+        
+        void operator()( PARTICLE_DATA& data )
         {
-            _policy( std::forward<ARGS>( args )... );
+            (*_policy)( data );
+        }
+        
+        void step( cpp::evolution_policy_step step )
+        {
+            _policy->step( step );
+        }
+    
+    private:
+        
+        //Interface for policy implementers:
+        struct policy_interface
+        {
+            virtual ~policy_interface(){}
+            
+            virtual void operator()( PARTICLE_DATA& data ) = 0;
+            
+            virtual void step( cpp::evolution_policy_step step ) = 0;  
+        };
+        
+        //Generic policy implementer: Wraps a policy in a homogeneous way
+        template<typename POLICY>
+        struct policy_impl : public policy_interface
+        {
+        public:
+            policy_impl( const POLICY& policy ) : 
+                _policy{ policy }
+            {}
+
+            void operator()( PARTICLE_DATA& data ) override
+            {
+                _policy( data );
+            }
+
+            void step( cpp::evolution_policy_step step_type ) override
+            {
+                _policy.step( step_type );
+            }
+            
+        private:
+            POLICY _policy;
+        };
+        
+        //Wraps a policy shared through shared ptrs
+        template<typename T>
+        class policy_impl<std::shared_ptr<T>> : public policy_interface
+        {
+        public:
+            template<typename... ARGS>
+            policy_impl( ARGS&&... args ) : 
+                _policy{ std::make_shared<T>( std::forward<ARGS>( args )... ) }
+            {}
+
+            void operator()( PARTICLE_DATA& data ) override
+            {
+                (*_policy)( data );
+            }
+
+            void step( cpp::evolution_policy_step step_type ) override
+            {
+                _policy->step( step_type );
+            }
+
+        private:
+            std::shared_ptr<T> _policy;
+        };
+
+        //Wraps a policy shared through reference wrappers:
+        template<typename T>
+        class policy_impl<std::reference_wrapper<T>> : public policy_interface
+        {
+        public:
+            template<typename... ARGS>
+            policy_impl( ARGS&&... args ) : 
+                _policy{ T{ std::forward<ARGS>( args )... } }
+            {}
+
+            policy_impl( const T& ref ) :
+                _policy{ ref }
+            {}
+
+            policy_impl( T& ref ) :
+                _policy{ ref }
+            {}
+
+            policy_impl( const std::reference_wrapper<T>& ref_wrapper ) :
+                _policy{ ref_wrapper }
+            {}
+                
+                
+
+            void operator()( PARTICLE_DATA& data ) override
+            {
+                _policy.get()( data );
+            }
+
+            void step( cpp::evolution_policy_step step_type ) override
+            {
+                _policy.get().step( step_type );
+            }
+
+        private:
+            std::reference_wrapper<T> _policy;
+        };
+
+        //Políticas sin estado genéricas (Son solo funciones a ejecutar sobre los datos de la partícula):
+        template<typename PDATA>
+        class policy_impl<std::function<void(PDATA&)>> : public policy_interface
+        {
+        public:
+            template<typename F>
+            policy_impl( F&& function ) : 
+                _policy{ std::forward<F>( function ) }
+            {}
+
+            void operator()( PARTICLE_DATA& data )
+            {
+                _policy( data );
+            }
+
+            //Las funciones son políticas sin estado: step() no hace nada
+            void step( cpp::evolution_policy_step step_type )
+            {}
+
+        private:
+            std::function<void(PARTICLE_DATA&)> _policy;
+        };
+        
+        std::shared_ptr<policy_interface> _policy;
+    };
+    
+    template<typename PARTICLE_DATA_POLICY>
+    class pipelined_evolution_policy
+    {
+    public:
+        using stage_type = cpp::particle_evolution_policy<PARTICLE_DATA_POLICY>;
+        
+        void operator()( PARTICLE_DATA_POLICY& data )
+        {
+            /* Nótese que data es una referencia a los datos de la partícula 
+             *
+             * pipelined_evolution_policy aprovecha esa característica para simular 
+             * un pipeline de políticas de evolución, es decir, una política de 
+             * evolución por etapas:
+             * 
+             *     STAGE 1
+             *   -----------
+             *     STAGE 2
+             *   -----------
+             *       ...    
+             *   -----------
+             *     STAGE N
+             * 
+             *  Donde cada etapa es una política de evolución propiamente dicha.
+             * 
+             * La idea es que la etapa n+1 coge como datos de entrada el resultado
+             * de la etapa n, y así sucesivamente. Al ser los datos de la partícula
+             * pasados como una referencia, ése comportamiento es muy fácil de simular 
+             * (Un simple bucle a través del pipeline)
+             */
+            for( auto& policy : _pipeline )
+                policy( data );
         }
         
         void step( cpp::evolution_policy_step step_type )
         {
-            _policy.get().step( step_type );
+            for( auto& policy : _pipeline )
+                policy.step( step_type );
         }
-            
+        
+        auto begin() const
+        {
+            return std::begin( _pipeline );
+        }
+        
+        auto end() const
+        {
+            return std::end( _pipeline );
+        }
+        
+        auto rbegin() const
+        {
+            return _pipeline.rbegin();
+        }
+        
+        auto rend() const
+        {
+            return _pipeline.rend();
+        }
+        
+        const stage_type& operator[]( std::size_t stage ) const
+        {
+            return _pipeline[stage];
+        }
+        
+        stage_type& operator[]( std::size_t stage )
+        {
+            return _pipeline[stage];
+        }
+        
+        template<typename POLICY>
+        void add_stage( POLICY&& policy )
+        {
+            _pipeline.emplace_back( std::forward<POLICY>( policy ) );
+        }
+        
+        template<typename POLICY>
+        void insert_stage( std::size_t stage , POLICY&& policy )
+        {
+            _pipeline.insert( _pipeline.begin() + stage , std::forward<POLICY>( policy ) );
+        }
+        
+        void remove_stage( std::size_t stage )
+        {
+            _pipeline.erase( _pipeline.begin() + stage );
+        }
+        
     private:
-        std::reference_wrapper<T> _policy;
+        std::vector<cpp::particle_evolution_policy<PARTICLE_DATA_POLICY>> _pipeline;
     };
     
 }

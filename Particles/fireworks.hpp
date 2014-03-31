@@ -21,6 +21,7 @@
 #include "particle_drawing_policies.hpp"
 
 #include "../snippets/math_2d.h"
+#include "particle_evolution_policies.hpp"
 
 #include <random>
 #include <iostream>
@@ -165,7 +166,7 @@ namespace cpp
         
         
         //Y finalmente el motor del sistema de "fuegos artificiales":
-        struct fireworks_engine : public cpp::particle_engine
+        struct fireworks_engine : public cpp::basic_particle_engine
         {
         private:
             std::vector<cpp::fireworks::particle> particles_; //Conjunto de partículas
@@ -210,12 +211,12 @@ namespace cpp
             template<typename CANVAS>
             void draw( CANVAS& canvas ) const
             {
-                cpp::particle_engine::draw( particles_ , cpp::pixel_particle_drawing_policy{} , canvas );
+                cpp::basic_particle_engine::draw( particles_ , cpp::pixel_particle_drawing_policy{} , canvas );
             }
             
             void step()
             {
-                cpp::particle_engine::step( particles_ , particles_lifetime_policy ,
+                cpp::basic_particle_engine::step( particles_ , particles_lifetime_policy ,
                                                          team_a ,
                                                          team_b ,
                                                          team_c 

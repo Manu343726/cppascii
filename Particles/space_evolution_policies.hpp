@@ -17,57 +17,110 @@
 #include "../snippets/aabb_2d.h"
 #include "../snippets/math_2d.h"
 
+#include <SFML/Graphics.hpp>
+
 namespace cpp
 {
+    enum class bounds_state
+    {
+        inside  , 
+        outside ,
+        unknown
+    };
     
-    struct collision_data
+    cpp::bounds_state inverse_bounds_state( cpp::bounds_state state )
+    {
+        if( state == cpp::bounds_state::inside )  return cpp::bounds_state::outside;
+        if( state == cpp::bounds_state::outside ) return cpp::bounds_state::inside;
+        if( state == cpp::bounds_state::unknown ) return cpp::bounds_state::unknown;
+        throw;
+    }
+    
+    struct bounding_data
     {
         dl32::vector_2df collision_point;
-        dl32::vector_2df collision_normal;
-        bool collision_flag;
+        dl32::vector_2df bounds_normal;
+        bounds_state     state;
         
-        collision_data( bool flag = false ,
+        bounding_data( bounds_state flag = cpp::bounds_state::unknown ,
                         const dl32::vector_2df& normal = dl32::vector_2df{} , 
                         const dl32::vector_2df& point = dl32::vector_2df{}
                       ) :
             collision_point{ point } ,
-            collision_normal{ normal } ,
-            collision_flag{ flag }
+            bounds_normal{ normal } ,
+            state{ flag }
         {}
-            
-        explicit operator bool() const
+        
+        bounding_data opposite() const
         {
-            return collision_flag;
+            return { cpp::inverse_bounds_state( state ) , dl32::vector_2df{ -bounds_normal.x , -bounds_normal.y } , collision_point };
         }
     };
     
     
-    struct recltangle_bounds
+    template<typename BOUNDS>
+    struct inverse_bounds
+    {
+        BOUNDS bounds;
+        
+        inverse_bounds( const BOUNDS& bounds_ ) :
+            bounds{ bounds_ }
+        {}
+        
+        template<typename POINT>
+        cpp::bounding_data operator()( const POINT& point ) const
+        {
+            return bounds( point ).opposite();
+        }
+    };
+    
+    
+    struct rectangle_bounds
     {
         cpp::aabb_2d<float> aabb;
         
-        recltangle_bounds( cpp::aabb_2d<float> aabb_ ) :
+        rectangle_bounds( cpp::aabb_2d<float> aabb_ ) :
             aabb{ std::move( aabb_ ) }
         {}
         
         template<typename POINT>
-        cpp::collision_data operator()( const POINT& point ) const
+        cpp::bounding_data operator()( const POINT& point ) const
         {
             auto relative_position = aabb.relative_position( point );
             
             switch( relative_position )
             {  //Nótese que las normales apuntan hacia el centro
-                case cpp::aabb_2d_area::inside: return { true };
-                case cpp::aabb_2d_area::north:  return { false , dl32::vector_2df{ 0.0f , -1.0f } };
-                case cpp::aabb_2d_area::south:  return { false , dl32::vector_2df{ 0.0f ,  1.0f } };
-                case cpp::aabb_2d_area::east:   return { false , dl32::vector_2df{-1.0f ,  0.0f } };
-                case cpp::aabb_2d_area::west:   return { false , dl32::vector_2df{ 1.0f ,  0.0f } };
-                case cpp::aabb_2d_area::north_east: return { false , aabb.center() - aabb.top_right_corner()    };
-                case cpp::aabb_2d_area::north_west: return { false , aabb.center() - aabb.top_left_corner()     };
-                case cpp::aabb_2d_area::south_east: return { false , aabb.center() - aabb.bottom_right_corner() };
-                case cpp::aabb_2d_area::south_west: return { false , aabb.center() - aabb.bottom_left_corner()  };
+                case cpp::aabb_2d_area::inside: return { cpp::bounds_state::inside };
+                case cpp::aabb_2d_area::north:  return { cpp::bounds_state::outside , dl32::vector_2df{ 0.0f , -1.0f } };
+                case cpp::aabb_2d_area::south:  return { cpp::bounds_state::outside , dl32::vector_2df{ 0.0f ,  1.0f } };
+                case cpp::aabb_2d_area::east:   return { cpp::bounds_state::outside , dl32::vector_2df{-1.0f ,  0.0f } };
+                case cpp::aabb_2d_area::west:   return { cpp::bounds_state::outside , dl32::vector_2df{ 1.0f ,  0.0f } };
+                case cpp::aabb_2d_area::north_east: return { cpp::bounds_state::outside , aabb.center() - aabb.top_right_corner()    };
+                case cpp::aabb_2d_area::north_west: return { cpp::bounds_state::outside , aabb.center() - aabb.top_left_corner()     };
+                case cpp::aabb_2d_area::south_east: return { cpp::bounds_state::outside , aabb.center() - aabb.bottom_right_corner() };
+                case cpp::aabb_2d_area::south_west: return { cpp::bounds_state::outside , aabb.center() - aabb.bottom_left_corner()  };
                 default: throw;
             }
+        }
+    };
+    
+    struct circle_bounds
+    {
+        dl32::vector_2df center;
+        float radious;
+        
+        circle_bounds( const dl32::vector_2df& center_ , float radious_ ) :
+            center{ center_ } ,
+            radious{ radious_ }
+        {}
+            
+        template<typename POINT>
+        cpp::bounding_data operator()( const POINT& point ) const
+        {
+            if( cpp::wrap( ( point - center ).length() ) > cpp::wrap( radious ) )
+                return { cpp::bounds_state::outside , ( center - point ).normalized() };
+            else
+                return { cpp::bounds_state::inside };
         }
     };
     
@@ -75,8 +128,9 @@ namespace cpp
     class bounded_space_evolution_policy
     {
     public:
-        bounded_space_evolution_policy( const BOUNDS& bounds ) :
-            _bounds{ bounds } ,
+        template<typename... ARGS>
+        bounded_space_evolution_policy( ARGS&&... args ) :
+            _bounds{ std::forward<ARGS>( args )... } ,
             _state{ bounds_state::unknown }
         {}
         
@@ -87,33 +141,28 @@ namespace cpp
             
             auto collision_data = _bounds( data.position() );
             
-            //Si la partícula está saliendo de los límites (Antes estaba dentro y ahora está fuera):
-            if( (bool)_state && !collision_data )
+            //Si la partícula está atravesando los límites (Antes estaba dentro y ahora está fuera o viceversa):
+            if( _state == cpp::bounds_state::inside && collision_data.state == cpp::bounds_state::outside )
             {
                 auto input_direction  = data.speed().normalized();
-                auto output_direction = input_direction.reflexion( collision_data.collision_normal ); 
+                auto output_direction = input_direction.reflexion( collision_data.bounds_normal ); 
 
                 data.speed() = data.speed().length() * output_direction;
             }
             
-            data.speed() += gravity;
+            _state = collision_data.state;
             
-            _state = collision_data.collision_flag ? bounds_state::inside : bounds_state::outside;
+            if( _state == cpp::bounds_state::inside ) data.color() = sf::Color::Cyan;
+            if( _state == cpp::bounds_state::outside ) data.color() = sf::Color::Red;
         }
         
         void step( cpp::evolution_policy_step step_type )
         {}
         
     private:
-        enum class bounds_state : bool
-        {
-            inside  = true  , 
-            outside = false ,
-            unknown = false
-        };
         
         BOUNDS       _bounds;
-        bounds_state _state;
+        cpp::bounds_state _state;
     };
 }
 
