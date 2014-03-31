@@ -21,6 +21,14 @@
                     <name>Release</name>
                     <type>1</type>
                 </confElem>
+                <confElem>
+                    <name>Release_windows</name>
+                    <type>1</type>
+                </confElem>
+                <confElem>
+                    <name>Debug_windows</name>
+                    <type>1</type>
+                </confElem>
             </confList>
             <formatting>
                 <project-formatting-style>false</project-formatting-style>

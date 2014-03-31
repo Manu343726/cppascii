@@ -142,5 +142,116 @@
       <item path="space_evolution_policies.hpp" ex="false" tool="3" flavor2="0">
       </item>
     </conf>
+    <conf name="Release_windows" type="1">
+      <toolsSet>
+        <compilerSet>default</compilerSet>
+        <dependencyChecking>true</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <compileType>
+        <cTool>
+          <developmentMode>5</developmentMode>
+        </cTool>
+        <ccTool>
+          <developmentMode>6</developmentMode>
+          <standard>8</standard>
+          <incDir>
+            <pElem>SFML-2.1/include</pElem>
+          </incDir>
+          <warningLevel>2</warningLevel>
+        </ccTool>
+        <fortranCompilerTool>
+          <developmentMode>5</developmentMode>
+        </fortranCompilerTool>
+        <asmTool>
+          <developmentMode>5</developmentMode>
+        </asmTool>
+        <linkerTool>
+          <linkerLibItems>
+            <linkerLibFileItem>SFML-2.1/bin/sfml-graphics-d-2.dll</linkerLibFileItem>
+            <linkerLibFileItem>SFML-2.1/bin/sfml-window-2.dll</linkerLibFileItem>
+            <linkerLibFileItem>SFML-2.1/bin/sfml-system-2.dll</linkerLibFileItem>
+          </linkerLibItems>
+        </linkerTool>
+        <requiredProjects>
+          <makeArtifact PL="../snippets"
+                        CT="1"
+                        CN="Debug"
+                        AC="true"
+                        BL="false"
+                        WD="../snippets"
+                        BC="${MAKE}  -f Makefile CONF=Debug"
+                        CC="${MAKE}  -f Makefile CONF=Debug clean"
+                        OP="${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/snippets">
+          </makeArtifact>
+        </requiredProjects>
+      </compileType>
+      <item path="bounded.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="fireworks.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="lifetime_evolution_policies.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="main.cpp" ex="false" tool="1" flavor2="8">
+        <ccTool>
+        </ccTool>
+      </item>
+      <item path="particle.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="particle_data_policies.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="particle_drawing_policies.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="particle_evolution_policies.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="particle_policies.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="space_evolution_policies.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+    </conf>
+    <conf name="Debug_windows" type="1">
+      <toolsSet>
+        <compilerSet>default</compilerSet>
+        <dependencyChecking>true</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <compileType>
+        <ccTool>
+          <standard>8</standard>
+          <incDir>
+            <pElem>SFML-2.1/include</pElem>
+          </incDir>
+        </ccTool>
+        <linkerTool>
+          <linkerLibItems>
+            <linkerLibFileItem>SFML-2.1/bin/sfml-graphics-2.dll</linkerLibFileItem>
+            <linkerLibFileItem>SFML-2.1/bin/sfml-system-2.dll</linkerLibFileItem>
+            <linkerLibFileItem>SFML-2.1/bin/sfml-window-2.dll</linkerLibFileItem>
+          </linkerLibItems>
+        </linkerTool>
+      </compileType>
+      <item path="bounded.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="fireworks.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="lifetime_evolution_policies.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="main.cpp" ex="false" tool="1" flavor2="8">
+        <ccTool>
+        </ccTool>
+      </item>
+      <item path="particle.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="particle_data_policies.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="particle_drawing_policies.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="particle_evolution_policies.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="particle_policies.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="space_evolution_policies.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+    </conf>
   </confs>
 </configurationDescriptor>

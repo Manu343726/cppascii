@@ -66,7 +66,7 @@ namespace cpp
 
         using current = tml::value_t<T,( ( HEAD - '0' ) << sizeof...(TAIL) )>;
         
-        using result = decltype( current{} | cpp::make_binary<T,tml::list<tml::character<TAIL>...>>{} );
+        using result = tml::value_t<T, current::value | cpp::make_binary<T,tml::list<tml::character<TAIL>...>>::value>;
     };
 }
 
