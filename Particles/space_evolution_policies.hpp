@@ -19,6 +19,12 @@
 
 #include <SFML/Graphics.hpp>
 
+#include "../snippets/Turbo/to_string.hpp"
+#include "../snippets/Turbo/core.hpp"
+
+#include <iostream>
+#include <type_traits>
+
 namespace cpp
 {
     enum class bounds_state
@@ -63,8 +69,9 @@ namespace cpp
     {
         BOUNDS bounds;
         
-        inverse_bounds( const BOUNDS& bounds_ ) :
-            bounds{ bounds_ }
+        template<typename... ARGS>
+        inverse_bounds( ARGS&&... args ) :
+            bounds{ std::forward<ARGS>( args )... }
         {}
         
         template<typename POINT>
@@ -74,8 +81,16 @@ namespace cpp
         }
     };
     
+    template<typename BOUNDS>
+    struct bounds_inverser
+    {
+        cpp::inverse_bounds<BOUNDS> inversed() const
+        {
+            return cpp::inverse_bounds<BOUNDS>{ static_cast<const BOUNDS&>( *this ) };
+        }
+    };
     
-    struct rectangle_bounds
+    struct rectangle_bounds : public cpp::bounds_inverser<rectangle_bounds>
     {
         cpp::aabb_2d<float> aabb;
         
@@ -104,7 +119,7 @@ namespace cpp
         }
     };
     
-    struct circle_bounds
+    struct circle_bounds : public cpp::bounds_inverser<circle_bounds>
     {
         dl32::vector_2df center;
         float radious;
@@ -120,7 +135,7 @@ namespace cpp
             if( cpp::wrap( ( point - center ).length() ) > cpp::wrap( radious ) )
                 return { cpp::bounds_state::outside , ( center - point ).normalized() };
             else
-                return { cpp::bounds_state::inside };
+                return { cpp::bounds_state::inside , ( center - point ).normalized() };
         }
     };
     
@@ -151,9 +166,6 @@ namespace cpp
             }
             
             _state = collision_data.state;
-            
-            if( _state == cpp::bounds_state::inside ) data.color() = sf::Color::Cyan;
-            if( _state == cpp::bounds_state::outside ) data.color() = sf::Color::Red;
         }
         
         void step( cpp::evolution_policy_step step_type )
@@ -164,6 +176,12 @@ namespace cpp
         BOUNDS       _bounds;
         cpp::bounds_state _state;
     };
+    
+    template<typename BOUNDS>
+    cpp::bounded_space_evolution_policy<BOUNDS> make_bounds_policy( BOUNDS&& bounds )
+    {
+        return cpp::bounded_space_evolution_policy<BOUNDS>{ std::forward<BOUNDS>( bounds ) };
+    }
 }
 
 #endif	/* SPACE_EVOLUTION_POLICIES_HPP */

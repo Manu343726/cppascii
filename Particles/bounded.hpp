@@ -30,7 +30,7 @@ namespace cpp
                                                     cpp::pipelined_evolution_policy<cpp::default_particle_data_holder>,
                                                     cpp::pixel_particle_drawing_policy>;
         
-            bounded_engine( std::size_t particles_count , const dl32::vector_2df& begin , float speed , const bounds_t& bounds , const cpp::circle_bounds& obstacle )
+            void initialize( std::size_t particles_count , const dl32::vector_2df& begin , float speed , const cpp::pipelined_evolution_policy<cpp::default_particle_data_holder>& pipeline )
             {
                 std::mt19937 prng;
                 std::uniform_real_distribution<float> dist{ 0.0f , 2.0f * 3.141592654f };
@@ -39,13 +39,6 @@ namespace cpp
                 {
                     float angle = dist( prng );
                     dl32::vector_2df particle_speed{ std::cos( angle ) * speed , std::sin( angle ) * speed };
-                    
-                    cpp::pipelined_evolution_policy<cpp::default_particle_data_holder> pipeline;
-                    
-                    
-                    pipeline.add_stage( cpp::bounded_space_evolution_policy<bounds_t>{ bounds } );
-                    pipeline.add_stage( cpp::bounded_space_evolution_policy<obstacle_t>{ obstacle_t{ obstacle } } );
-                    
                     
                     _particles.emplace_back( typename particle::data_policy_t{ begin , particle_speed , sf::Color::White } ,
                                              pipeline ,

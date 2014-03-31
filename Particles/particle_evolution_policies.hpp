@@ -89,7 +89,7 @@ namespace cpp
         };
         
         //Generic policy implementer: Wraps a policy in a homogeneous way
-        template<typename POLICY>
+        template<typename POLICY , typename IS_FUNCTION = std::is_function<POLICY>>
         struct policy_impl : public policy_interface
         {
         public:
@@ -113,7 +113,7 @@ namespace cpp
         
         //Wraps a policy shared through shared ptrs
         template<typename T>
-        class policy_impl<std::shared_ptr<T>> : public policy_interface
+        class policy_impl<std::shared_ptr<T>,std::false_type> : public policy_interface
         {
         public:
             template<typename... ARGS>
@@ -137,7 +137,7 @@ namespace cpp
 
         //Wraps a policy shared through reference wrappers:
         template<typename T>
-        class policy_impl<std::reference_wrapper<T>> : public policy_interface
+        class policy_impl<std::reference_wrapper<T>,std::false_type> : public policy_interface
         {
         public:
             template<typename... ARGS>
@@ -174,8 +174,8 @@ namespace cpp
         };
 
         //Políticas sin estado genéricas (Son solo funciones a ejecutar sobre los datos de la partícula):
-        template<typename PDATA>
-        class policy_impl<std::function<void(PDATA&)>> : public policy_interface
+        template<typename POLICY>
+        class policy_impl<POLICY,std::true_type> : public policy_interface
         {
         public:
             template<typename F>
