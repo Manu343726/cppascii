@@ -84,14 +84,21 @@ namespace cpp
             step_evolution_policies( tail... );
         }
         
+        template<typename PARTICLE_DATA , typename POLICY>
+        static cpp::particle_evolution_policy<PARTICLE_DATA> erase( const POLICY& policy )
+        {
+            return { policy };
+        }
+        
     protected:
         template<typename PARTICLES , typename... EVOLUTION_POLICIES>
         void step( PARTICLES& particles , EVOLUTION_POLICIES&... evolution_policies) const
         {
+            using particle_type = typename std::remove_reference<decltype( *(std::declval<decltype( std::begin( particles ) )>()) )>::type;
+            using particle_data = typename particle_type::data_policy_t;
+            
             for( auto& particle : particles )
                 particle.step();
-            
-            step_evolution_policies( evolution_policies... );
         }
         
         template<typename PARTICLES , typename DRAWING_POLICY , typename CANVAS>

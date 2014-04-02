@@ -13,6 +13,7 @@
 
 #include "fireworks.hpp"
 #include "bounded.hpp"
+#include "SFML-2.1/include/SFML/Graphics/Color.hpp"
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
@@ -78,16 +79,23 @@ void init_pipeline()
 {
     cpp::pipelined_evolution_policy<cpp::default_particle_data_holder> pipeline;
     
-    pipeline.add_stage( cpp::make_bounds_policy( cpp::inverse_bounds<cpp::rectangle_bounds>{ cpp::aabb_2d<float>::from_coords_and_size( 0.0f , 0.0f , 200.0f , 200.0f ) } ) );
+    pipeline.add_stage( cpp::make_bounds_policy( cpp::inverse_bounds<cpp::circle_bounds>{ dl32::vector_2df{ 400.0f , 300.0f } , 100.0f } ) );
     pipeline.add_stage( cpp::make_bounds_policy( cpp::rectangle_bounds{ cpp::aabb_2d<float>::from_coords_and_size( 0.0f , 0.0f , 800.0f , 600.0f ) } ) );
     pipeline.add_stage( []( cpp::default_particle_data_holder& data )
                         {
-                           data.speed() += dl32::vector_2df{ 0.0f , -0.000998 };
+                           data.speed() *= 1.001f;
+                        }
+                      );
+    pipeline.add_stage( []( cpp::default_particle_data_holder& data )
+                        {
+                           data.color() = sf::Color{ (int)data.position().x % 256 , 
+                                                     (int)data.position().y % 256 , 
+                                                     (int)data.position().y % 256 };
                         }
                       );
     
     
-    bounded_engine.initialize( 10000u , dl32::vector_2df{400.0f , 300.0f } , 0.06f , pipeline );
+    bounded_engine.initialize( 100000u , dl32::vector_2df{400.0f , 300.0f } , 0.06f , pipeline );
 }
 
 int main()

@@ -53,13 +53,9 @@ namespace cpp
         
         template<typename POLICY>
         particle_evolution_policy( const POLICY& policy ) :
-            _policy{ std::make_shared<policy_impl<POLICY>>( policy ) }
+            _policy{ new policy_impl<POLICY,has_step<POLICY>>{ policy } }
         {}
             
-        particle_evolution_policy( std::function<void(PARTICLE_DATA&)> policy ) :
-            _policy{ std::make_shared<policy_impl<std::function<void(PARTICLE_DATA&)>>>( policy ) }
-        {}
-        
         
         void operator()( PARTICLE_DATA& data ) const
         {
@@ -77,6 +73,20 @@ namespace cpp
         }
     
     private:
+        //Traits to detect when a type has a step() member function, to type-erase it acordingly:
+        
+        //Just a template to do SFINAE
+        template<typename T> using dummy_sfinae_thing = void;
+        
+        //A trait which checks if a type has a step() member function:
+        //NOTE: The second parameter is just used to do SFINAE, thats why its optional
+        TURBO_DEFINE_FUNCTION( has_step , (typename T , typename U = void) , (T,U) , (std::false_type) );
+        
+        template<typename T>
+        struct has_step_t<T,dummy_sfinae_thing<decltype( std::declval<T>().step() )>> : public tml::function<std::false_type> {};
+        
+        
+        /*--------------------------------------------*/
         
         //Interface for policy implementers:
         struct policy_interface
@@ -88,9 +98,13 @@ namespace cpp
             virtual void step( cpp::evolution_policy_step step ) = 0;  
         };
         
-        //Generic policy implementer: Wraps a policy in a homogeneous way
-        template<typename POLICY , typename IS_FUNCTION = std::is_function<POLICY>>
-        struct policy_impl : public policy_interface
+        //Specialized policy implementation
+        template<typename POLICY , typename HAS_STEP = std::false_type>
+        struct policy_impl;
+        
+        //Specialization for any function-like type with a step() member function:
+        template<typename POLICY>
+        struct policy_impl<POLICY,std::true_type> : public policy_interface
         {
         public:
             policy_impl( const POLICY& policy ) : 
@@ -111,14 +125,14 @@ namespace cpp
             POLICY _policy;
         };
         
-        //Wraps a policy shared through shared ptrs
+        //Specialization for shared_ptrs of policies (Policies shared with shared_ptrs)
         template<typename T>
         class policy_impl<std::shared_ptr<T>,std::false_type> : public policy_interface
         {
         public:
             template<typename... ARGS>
             policy_impl( ARGS&&... args ) : 
-                _policy{ std::make_shared<T>( std::forward<ARGS>( args )... ) }
+                _policy{ std::forward<ARGS>( args )... }
             {}
 
             void operator()( PARTICLE_DATA& data ) override
@@ -132,69 +146,36 @@ namespace cpp
             }
 
         private:
+            //Note that the shared policy is type-erased too
             std::shared_ptr<T> _policy;
         };
-
-        //Wraps a policy shared through reference wrappers:
+        
+        
+        
+        //Specialization for other function-like types which don't have a step() member function:
         template<typename T>
-        class policy_impl<std::reference_wrapper<T>,std::false_type> : public policy_interface
+        struct policy_impl<T,std::false_type> : public policy_interface
         {
-        public:
             template<typename... ARGS>
-            policy_impl( ARGS&&... args ) : 
-                _policy{ T{ std::forward<ARGS>( args )... } }
-            {}
-
-            policy_impl( const T& ref ) :
-                _policy{ ref }
-            {}
-
-            policy_impl( T& ref ) :
-                _policy{ ref }
-            {}
-
-            policy_impl( const std::reference_wrapper<T>& ref_wrapper ) :
-                _policy{ ref_wrapper }
+            policy_impl( ARGS&&... args ) :
+                _policy{ std::forward<ARGS>( args )... }
             {}
                 
+                void operator()( PARTICLE_DATA& data ) override
+                {
+                    _policy( data );
+                }
                 
-
-            void operator()( PARTICLE_DATA& data ) override
-            {
-                _policy.get()( data );
-            }
-
-            void step( cpp::evolution_policy_step step_type ) override
-            {
-                _policy.get().step( step_type );
-            }
-
+                void step( cpp::evolution_policy_step step_type ) override
+                {
+                    /* does nothing */
+                }
+                
         private:
-            std::reference_wrapper<T> _policy;
+            T _policy;
         };
 
-        //Políticas sin estado genéricas (Son solo funciones a ejecutar sobre los datos de la partícula):
-        template<typename POLICY>
-        class policy_impl<POLICY,std::true_type> : public policy_interface
-        {
-        public:
-            template<typename F>
-            policy_impl( F&& function ) : 
-                _policy{ std::forward<F>( function ) }
-            {}
-
-            void operator()( PARTICLE_DATA& data )
-            {
-                _policy( data );
-            }
-
-            //Las funciones son políticas sin estado: step() no hace nada
-            void step( cpp::evolution_policy_step step_type )
-            {}
-
-        private:
-            std::function<void(PARTICLE_DATA&)> _policy;
-        };
+        
         
         std::shared_ptr<policy_interface> _policy;
     };
@@ -271,7 +252,7 @@ namespace cpp
         template<typename POLICY>
         void add_stage( POLICY&& policy )
         {
-            _pipeline.emplace_back( std::forward<POLICY>( policy ) );
+            _pipeline.push_back( std::forward<POLICY>( policy ) );
         }
         
         template<typename POLICY>

@@ -138,21 +138,22 @@ namespace cpp
             }
         };
         
-        using lifetime_policy = std::reference_wrapper<cpp::fireworks::firework_lifetime_policy<cpp::default_particle_data_holder>>;
+        using lifetime_policy = cpp::fireworks::firework_lifetime_policy<cpp::default_particle_data_holder>;
+        using shared_lifetime_policy = std::shared_ptr<cpp::fireworks::lifetime_policy>;
         
         //Una partícula de nuestro sistema de fuegos artificiales es una partícula que usa como política la política
         //del sistema de fuegos artificiales (Valga la redundancia...):
         struct particle : public cpp::policied_particle<cpp::default_particle_data_holder,
-                                                        cpp::fireworks::lifetime_policy,
+                                                        cpp::fireworks::shared_lifetime_policy,
                                                         cpp::pixel_particle_drawing_policy>
         {
             using base = cpp::policied_particle<cpp::default_particle_data_holder,
-                                                        cpp::fireworks::lifetime_policy,
+                                                        cpp::fireworks::shared_lifetime_policy,
                                                         cpp::pixel_particle_drawing_policy>;
             
         
             
-            particle( const cpp::fireworks::lifetime_policy& policy ) :
+            particle( const cpp::fireworks::shared_lifetime_policy& policy ) :
                 base
                 {
                     cpp::default_particle_data_holder{} , //Inicializamos los datos de la partícula por defecto
@@ -173,35 +174,33 @@ namespace cpp
             
             //Política de evolución de las partículas:
             
-            using lifetime_policy_t = cpp::fireworks::firework_lifetime_policy<cpp::default_particle_data_holder>;
-            
-            lifetime_policy_t particles_lifetime_policy , team_a , team_b , team_c; 
+            shared_lifetime_policy particles_lifetime_policy , team_a , team_b , team_c; 
             
             
         public:
             fireworks_engine( int lifetime , const dl32::vector_2df& center , float speed ) :
-                particles_lifetime_policy{ lifetime , center , speed , 1.0003f , 0.9997f } ,
-                team_a{ lifetime , center                                   , speed      , 1.0003f , 0.9998f , 0.3f  , 0.6f  } ,
-                team_b{ lifetime , center + dl32::vector_2df{ 1.0f , 1.0f } , speed*1.0f , 1.0006f , 0.9997f , 0.2f  , 0.24f } ,
-                team_c{ lifetime , center - dl32::vector_2df{ 1.0f , 1.0f } , speed*1.1f , 1.003f  , 0.9992f , 0.04f , 0.5f  }
+                particles_lifetime_policy{ std::make_shared<lifetime_policy>( lifetime , center , speed , 1.0003f , 0.9997f ) } ,
+                team_a{ std::make_shared<lifetime_policy>( lifetime , center                                   , speed      , 1.0003f , 0.9998f , 0.3f  , 0.6f  ) } ,
+                team_b{ std::make_shared<lifetime_policy>( lifetime , center + dl32::vector_2df{ 1.0f , 1.0f } , speed*1.0f , 1.0006f , 0.9997f , 0.2f  , 0.24f ) } ,
+                team_c{ std::make_shared<lifetime_policy>( lifetime , center - dl32::vector_2df{ 1.0f , 1.0f } , speed*1.1f , 1.003f  , 0.9992f , 0.04f , 0.5f  ) }
             {
                 
                 //Las partículas guardan una referencia a la política de evolución que siguen:
-                cpp::fireworks::particle main_particle{ std::ref( particles_lifetime_policy ) };
+                cpp::fireworks::particle main_particle{ particles_lifetime_policy };
                 particles_.assign( 1000u , main_particle );       
                 
                 
                 
                 //Las partículas guardan una referencia a la política de evolución que siguen:
-                cpp::fireworks::particle team_a_particle{ std::ref( team_a ) };
+                cpp::fireworks::particle team_a_particle{ team_a  };
                 particles_.insert( std::end( particles_ ) , 1000u , team_a_particle );   
                 
                 //Las partículas guardan una referencia a la política de evolución que siguen:
-                cpp::fireworks::particle team_b_particle{ std::ref( team_b ) };
+                cpp::fireworks::particle team_b_particle{ team_b };
                 particles_.insert( std::end( particles_ ) , 1000u , team_b_particle );   
                 
                 //Las partículas guardan una referencia a la política de evolución que siguen:
-                cpp::fireworks::particle team_c_particle{ std::ref( team_c ) };
+                cpp::fireworks::particle team_c_particle{ team_c };
                 particles_.insert( std::end( particles_ ) , 1000u , team_c_particle );            
             }
                 
