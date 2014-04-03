@@ -19,6 +19,8 @@
 #include <utility>
 #include <vector>
 
+#include "../snippets/Turbo/core.hpp"
+
 namespace cpp
 {
     enum class evolution_policy_step
@@ -37,11 +39,76 @@ namespace cpp
     
     
     
+    //Alias for shared policies:
+    template<typename POLICY>
+    using shared_policy = std::shared_ptr<POLICY>;
     
+    //Traits to detect when a type has a step() member function, to type-erase it acordingly:
+    namespace impl
+    {
+        //Just a template to do SFINAE
+        template<typename T> using dummy_sfinae_thing = void;
+        
+        //A trait which checks if a type has a step() member function:
+        //NOTE: The second parameter is just used to do SFINAE, thats why its optional
+        TURBO_DEFINE_FUNCTION( has_step , (typename T , typename U = void) , (T,U) , (tml::false_type) );
+        
+        template<typename T>
+        struct has_step_t<T,dummy_sfinae_thing<decltype( std::declval<T>().step( std::declval<cpp::evolution_policy_step>() ) )>> : public tml::function<tml::true_type> {};
+        
+        //A trait which checks if a type has a step() member function:
+        //NOTE: The second parameter is just used to do SFINAE, thats why its optional
+        TURBO_DEFINE_FUNCTION( has_call , (typename T , typename PDATA , typename U = void) , (T,PDATA,U) , (tml::false_type) );
+        
+        template<typename T , typename PDATA>
+        struct has_call_t<T,PDATA,dummy_sfinae_thing<decltype( std::declval<T>()( std::declval<PDATA>() ) )>> : public tml::function<tml::true_type> {};
+    }   
     
+    template<typename POLICY , typename PARTICLE_DATA>
+    using is_nonshared_policy = impl::has_call<POLICY,PARTICLE_DATA>;
     
+    template<typename POLICY , typename PARTICLE_DATA>
+    using is_nonshared_stated_policy = decltype( is_nonshared_policy<POLICY,PARTICLE_DATA>{} && impl::has_step<POLICY>{} );
     
+    template<typename POLICY , typename PARTICLE_DATA>
+    using is_nonshared_nonstated_policy = decltype( is_nonshared_policy<POLICY,PARTICLE_DATA>{} && !impl::has_step<POLICY>{} );
+
+    TURBO_DEFINE_FUNCTION( is_shared_policy , (typename T , typename PDATA) , (T,PDATA) , (tml::false_type) );
+    TURBO_DEFINE_FUNCTION( is_shared_stated_policy , (typename T , typename PDATA) , (T,PDATA) , (tml::false_type) );
+    TURBO_DEFINE_FUNCTION( is_shared_nonstated_policy , (typename T , typename PDATA) , (T,PDATA) , (tml::false_type) );
     
+    template<typename T , typename PDATA>
+    struct is_shared_policy_t<cpp::shared_policy<T>,PDATA> : public tml::function<is_nonshared_policy<T,PDATA>> {};
+    template<typename T , typename PDATA>
+    struct is_shared_stated_policy_t<cpp::shared_policy<T>,PDATA> : public tml::function<is_nonshared_stated_policy<T,PDATA>> {};
+    template<typename T , typename PDATA>
+    struct is_shared_nonstated_policy_t<cpp::shared_policy<T>,PDATA> : public tml::function<is_nonshared_nonstated_policy<T,PDATA>> {};
+    
+    template<typename T , typename PARTICLE_DATA>
+    using is_policy = decltype( is_nonshared_policy<T,PARTICLE_DATA>{} || is_shared_policy<T,PARTICLE_DATA>{} );
+    template<typename T , typename PARTICLE_DATA>
+    using is_stated_policy = decltype( is_nonshared_stated_policy<T,PARTICLE_DATA>{} || is_shared_stated_policy<T,PARTICLE_DATA>{} );
+    template<typename T , typename PARTICLE_DATA>
+    using is_nonstated_policy = decltype( is_nonshared_policy<T,PARTICLE_DATA>{} || is_shared_nonstated_policy<T,PARTICLE_DATA>{} );
+    
+    namespace evolution_policy_categories
+    {
+        struct shared {};
+        struct nonshared {};
+        struct stated {};
+        struct non_stated {};
+    }
+    
+    enum class evolution_policy_category
+    {
+        shared,
+        nonshared,
+        stated,
+        nonstated,
+        shared_stated,
+        nonshared_stated,
+        nonshared_nonstated
+    };
     
     /* Type-erased particle evolution policy */
     
@@ -53,14 +120,11 @@ namespace cpp
         
         template<typename POLICY>
         particle_evolution_policy( const POLICY& policy ) :
-            _policy{ new policy_impl<POLICY,has_step<POLICY>>{ policy } }
-        {}
-            
-        
-        void operator()( PARTICLE_DATA& data ) const
+            _policy{ new policy_impl<POLICY,cpp::is_shared_policy<POLICY,PARTICLE_DATA>,cpp::is_stated_policy<POLICY,PARTICLE_DATA>>{ policy } }
         {
-            (*_policy)( data );
+            TURBO_ASSERT( (cpp::is_policy<POLICY,PARTICLE_DATA>) , "The parameter is not a valid evolution policy class" );
         }
+
         
         void operator()( PARTICLE_DATA& data )
         {
@@ -73,20 +137,6 @@ namespace cpp
         }
     
     private:
-        //Traits to detect when a type has a step() member function, to type-erase it acordingly:
-        
-        //Just a template to do SFINAE
-        template<typename T> using dummy_sfinae_thing = void;
-        
-        //A trait which checks if a type has a step() member function:
-        //NOTE: The second parameter is just used to do SFINAE, thats why its optional
-        TURBO_DEFINE_FUNCTION( has_step , (typename T , typename U = void) , (T,U) , (std::false_type) );
-        
-        template<typename T>
-        struct has_step_t<T,dummy_sfinae_thing<decltype( std::declval<T>().step() )>> : public tml::function<std::false_type> {};
-        
-        
-        /*--------------------------------------------*/
         
         //Interface for policy implementers:
         struct policy_interface
@@ -99,12 +149,32 @@ namespace cpp
         };
         
         //Specialized policy implementation
-        template<typename POLICY , typename HAS_STEP = std::false_type>
+        template<typename POLICY , typename IS_SHARED , typename IS_STATED>
         struct policy_impl;
         
-        //Specialization for any function-like type with a step() member function:
+        
         template<typename POLICY>
-        struct policy_impl<POLICY,std::true_type> : public policy_interface
+        struct policy_impl<POLICY,tml::false_type,tml::false_type> : public policy_interface
+        {
+        public:
+            policy_impl( const POLICY& policy ) : 
+                _policy{ policy }
+            {}
+
+            void operator()( PARTICLE_DATA& data ) override
+            {
+                _policy( data );
+            }
+
+            void step( cpp::evolution_policy_step step_type ) override
+            {}
+            
+        private:
+            POLICY _policy;
+        };
+        
+        template<typename POLICY>
+        struct policy_impl<POLICY,tml::false_type,tml::true_type> : public policy_interface
         {
         public:
             policy_impl( const POLICY& policy ) : 
@@ -125,9 +195,9 @@ namespace cpp
             POLICY _policy;
         };
         
-        //Specialization for shared_ptrs of policies (Policies shared with shared_ptrs)
-        template<typename T>
-        class policy_impl<std::shared_ptr<T>,std::false_type> : public policy_interface
+        
+        template<typename POLICY>
+        class policy_impl<POLICY,tml::true_type,tml::false_type> : public policy_interface
         {
         public:
             template<typename... ARGS>
@@ -139,43 +209,36 @@ namespace cpp
             {
                 (*_policy)( data );
             }
+                
+            void step( cpp::evolution_policy_step step_type ) override
+            {}
+
+        private:
+            //Note that the shared policy is type-erased too
+            POLICY _policy;
+        };
+        
+        template<typename POLICY>
+        struct policy_impl<POLICY,tml::true_type,tml::true_type> : public policy_interface
+        {
+        public:
+            policy_impl( const POLICY& policy ) : 
+                _policy{ policy }
+            {}
+
+            void operator()( PARTICLE_DATA& data ) override
+            {
+                (*_policy)( data );
+            }
 
             void step( cpp::evolution_policy_step step_type ) override
             {
                 _policy->step( step_type );
             }
-
+            
         private:
-            //Note that the shared policy is type-erased too
-            std::shared_ptr<T> _policy;
+            POLICY _policy;
         };
-        
-        
-        
-        //Specialization for other function-like types which don't have a step() member function:
-        template<typename T>
-        struct policy_impl<T,std::false_type> : public policy_interface
-        {
-            template<typename... ARGS>
-            policy_impl( ARGS&&... args ) :
-                _policy{ std::forward<ARGS>( args )... }
-            {}
-                
-                void operator()( PARTICLE_DATA& data ) override
-                {
-                    _policy( data );
-                }
-                
-                void step( cpp::evolution_policy_step step_type ) override
-                {
-                    /* does nothing */
-                }
-                
-        private:
-            T _policy;
-        };
-
-        
         
         std::shared_ptr<policy_interface> _policy;
     };
