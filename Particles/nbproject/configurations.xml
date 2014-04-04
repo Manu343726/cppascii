@@ -13,6 +13,7 @@
       <itemPath>particle_evolution_policies.hpp</itemPath>
       <itemPath>particle_policies.hpp</itemPath>
       <itemPath>space_evolution_policies.hpp</itemPath>
+      <itemPath>type_erased_evolution_policy.hpp</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
@@ -78,6 +79,8 @@
       </item>
       <item path="space_evolution_policies.hpp" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="type_erased_evolution_policy.hpp" ex="false" tool="3" flavor2="0">
+      </item>
     </conf>
     <conf name="Release" type="1">
       <toolsSet>
@@ -140,6 +143,8 @@
       <item path="particle_policies.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="space_evolution_policies.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="type_erased_evolution_policy.hpp" ex="false" tool="3" flavor2="0">
       </item>
     </conf>
     <conf name="Release_windows" type="1">
@@ -208,6 +213,8 @@
       </item>
       <item path="space_evolution_policies.hpp" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="type_erased_evolution_policy.hpp" ex="false" tool="3" flavor2="0">
+      </item>
     </conf>
     <conf name="Debug_windows" type="1">
       <toolsSet>
@@ -251,6 +258,8 @@
       <item path="particle_policies.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="space_evolution_policies.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="type_erased_evolution_policy.hpp" ex="false" tool="3" flavor2="0">
       </item>
     </conf>
   </confs>

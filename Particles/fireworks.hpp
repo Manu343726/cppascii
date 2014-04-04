@@ -139,7 +139,7 @@ namespace cpp
         };
         
         using lifetime_policy = cpp::fireworks::firework_lifetime_policy<cpp::default_particle_data_holder>;
-        using shared_lifetime_policy = std::shared_ptr<cpp::fireworks::lifetime_policy>;
+        using shared_lifetime_policy = cpp::shared_policy<cpp::fireworks::lifetime_policy>;
         
         //Una partícula de nuestro sistema de fuegos artificiales es una partícula que usa como política la política
         //del sistema de fuegos artificiales (Valga la redundancia...):

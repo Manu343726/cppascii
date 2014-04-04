@@ -13,6 +13,7 @@
 #include "lifetime_evolution_policies.hpp"
 #include "space_evolution_policies.hpp"
 #include "particle_drawing_policies.hpp"
+#include "type_erased_evolution_policy.hpp"
 
 #include "../snippets/math_2d.h"
 
@@ -27,10 +28,10 @@ namespace cpp
             using bounds_t   = cpp::rectangle_bounds;
         
             using particle = cpp::policied_particle<cpp::default_particle_data_holder,
-                                                    cpp::pipelined_evolution_policy<cpp::default_particle_data_holder>,
+                                                    cpp::evolution_policies_pipeline<cpp::default_particle_data_holder>,
                                                     cpp::pixel_particle_drawing_policy>;
         
-            void initialize( std::size_t particles_count , const dl32::vector_2df& begin , float speed , const cpp::pipelined_evolution_policy<cpp::default_particle_data_holder>& pipeline )
+            void initialize( std::size_t particles_count , const dl32::vector_2df& begin , float speed , const cpp::evolution_policies_pipeline<cpp::default_particle_data_holder>& pipeline )
             {
                 std::mt19937 prng;
                 std::uniform_real_distribution<float> dist{ 0.0f , 2.0f * 3.141592654f };

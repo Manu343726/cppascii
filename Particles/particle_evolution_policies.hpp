@@ -50,11 +50,19 @@ namespace cpp
         template<typename T> using dummy_sfinae_thing = void;
         
         //A trait which checks if a type has a step() member function:
-        //NOTE: The second parameter is just used to do SFINAE, thats why its optional
-        TURBO_DEFINE_FUNCTION( has_step , (typename T , typename U = void) , (T,U) , (tml::false_type) );
+        template<typename T>
+        struct has_step_t
+        {
+            template<typename U>
+            static tml::true_type test( decltype( &U::step ) );
+            template<typename U>
+            static tml::false_type test(...);
+            
+            using result = decltype( test<T>( nullptr ) );
+        };
         
         template<typename T>
-        struct has_step_t<T,dummy_sfinae_thing<decltype( std::declval<T>().step( std::declval<cpp::evolution_policy_step>() ) )>> : public tml::function<tml::true_type> {};
+        using has_step = typename has_step_t<T>::result;
         
         //A trait which checks if a type has a step() member function:
         //NOTE: The second parameter is just used to do SFINAE, thats why its optional
@@ -64,11 +72,14 @@ namespace cpp
         struct has_call_t<T,PDATA,dummy_sfinae_thing<decltype( std::declval<T>()( std::declval<PDATA>() ) )>> : public tml::function<tml::true_type> {};
     }   
     
+    template<typename POLICY>
+    using has_state = impl::has_step<POLICY>;
+    
     template<typename POLICY , typename PARTICLE_DATA>
     using is_nonshared_policy = impl::has_call<POLICY,PARTICLE_DATA>;
     
     template<typename POLICY , typename PARTICLE_DATA>
-    using is_nonshared_stated_policy = decltype( is_nonshared_policy<POLICY,PARTICLE_DATA>{} && impl::has_step<POLICY>{} );
+    using is_nonshared_stated_policy = tml::logical_and<is_nonshared_policy<POLICY,PARTICLE_DATA>,impl::has_step<POLICY>>;
     
     template<typename POLICY , typename PARTICLE_DATA>
     using is_nonshared_nonstated_policy = decltype( is_nonshared_policy<POLICY,PARTICLE_DATA>{} && !impl::has_step<POLICY>{} );
@@ -85,11 +96,11 @@ namespace cpp
     struct is_shared_nonstated_policy_t<cpp::shared_policy<T>,PDATA> : public tml::function<is_nonshared_nonstated_policy<T,PDATA>> {};
     
     template<typename T , typename PARTICLE_DATA>
-    using is_policy = decltype( is_nonshared_policy<T,PARTICLE_DATA>{} || is_shared_policy<T,PARTICLE_DATA>{} );
+    using is_policy = tml::logical_or<is_nonshared_policy<T,PARTICLE_DATA>,is_shared_policy<T,PARTICLE_DATA>>;
     template<typename T , typename PARTICLE_DATA>
-    using is_stated_policy = decltype( is_nonshared_stated_policy<T,PARTICLE_DATA>{} || is_shared_stated_policy<T,PARTICLE_DATA>{} );
+    using is_stated_policy = tml::logical_or<is_nonshared_stated_policy<T,PARTICLE_DATA>,is_shared_stated_policy<T,PARTICLE_DATA>>;
     template<typename T , typename PARTICLE_DATA>
-    using is_nonstated_policy = decltype( is_nonshared_policy<T,PARTICLE_DATA>{} || is_shared_nonstated_policy<T,PARTICLE_DATA>{} );
+    using is_nonstated_policy = tml::logical_or<is_nonshared_policy<T,PARTICLE_DATA>,is_shared_nonstated_policy<T,PARTICLE_DATA>>;
     
     namespace evolution_policy_categories
     {
@@ -110,229 +121,75 @@ namespace cpp
         nonshared_nonstated
     };
     
-    /* Type-erased particle evolution policy */
     
-    template<typename PARTICLE_DATA>
-    class particle_evolution_policy
+    namespace impl
     {
-    public:
-        using particle_data_policy = PARTICLE_DATA;
-        
-        template<typename POLICY>
-        particle_evolution_policy( const POLICY& policy ) :
-            _policy{ new policy_impl<POLICY,cpp::is_shared_policy<POLICY,PARTICLE_DATA>,cpp::is_stated_policy<POLICY,PARTICLE_DATA>>{ policy } }
-        {
-            TURBO_ASSERT( (cpp::is_policy<POLICY,PARTICLE_DATA>) , "The parameter is not a valid evolution policy class" );
-        }
-
-        
-        void operator()( PARTICLE_DATA& data )
-        {
-            (*_policy)( data );
-        }
-        
-        void step( cpp::evolution_policy_step step )
-        {
-            _policy->step( step );
-        }
-    
-    private:
-        
-        //Interface for policy implementers:
-        struct policy_interface
-        {
-            virtual ~policy_interface(){}
-            
-            virtual void operator()( PARTICLE_DATA& data ) = 0;
-            
-            virtual void step( cpp::evolution_policy_step step ) = 0;  
-        };
-        
-        //Specialized policy implementation
         template<typename POLICY , typename IS_SHARED , typename IS_STATED>
-        struct policy_impl;
-        
+        struct stepper;
         
         template<typename POLICY>
-        struct policy_impl<POLICY,tml::false_type,tml::false_type> : public policy_interface
+        struct stepper<POLICY , tml::true_type , tml::true_type>
         {
-        public:
-            policy_impl( const POLICY& policy ) : 
-                _policy{ policy }
-            {}
-
-            void operator()( PARTICLE_DATA& data ) override
+            static void execute( POLICY& policy , cpp::evolution_policy_step step_type )
             {
-                _policy( data );
+                policy->step( step_type );
             }
-
-            void step( cpp::evolution_policy_step step_type ) override
-            {}
-            
-        private:
-            POLICY _policy;
         };
         
         template<typename POLICY>
-        struct policy_impl<POLICY,tml::false_type,tml::true_type> : public policy_interface
+        struct stepper<POLICY , tml::false_type , tml::true_type>
         {
-        public:
-            policy_impl( const POLICY& policy ) : 
-                _policy{ policy }
-            {}
-
-            void operator()( PARTICLE_DATA& data ) override
+            static void execute( POLICY& policy , cpp::evolution_policy_step step_type )
             {
-                _policy( data );
-            }
-
-            void step( cpp::evolution_policy_step step_type ) override
-            {
-                _policy.step( step_type );
-            }
-            
-        private:
-            POLICY _policy;
-        };
-        
-        
-        template<typename POLICY>
-        class policy_impl<POLICY,tml::true_type,tml::false_type> : public policy_interface
-        {
-        public:
-            template<typename... ARGS>
-            policy_impl( ARGS&&... args ) : 
-                _policy{ std::forward<ARGS>( args )... }
-            {}
-
-            void operator()( PARTICLE_DATA& data ) override
-            {
-                (*_policy)( data );
-            }
+                TURBO_ASSERT( (cpp::has_state<POLICY>) , "mmmmm..." );
                 
-            void step( cpp::evolution_policy_step step_type ) override
-            {}
-
-        private:
-            //Note that the shared policy is type-erased too
-            POLICY _policy;
-        };
-        
-        template<typename POLICY>
-        struct policy_impl<POLICY,tml::true_type,tml::true_type> : public policy_interface
-        {
-        public:
-            policy_impl( const POLICY& policy ) : 
-                _policy{ policy }
-            {}
-
-            void operator()( PARTICLE_DATA& data ) override
-            {
-                (*_policy)( data );
-            }
-
-            void step( cpp::evolution_policy_step step_type ) override
-            {
-                _policy->step( step_type );
-            }
-            
-        private:
-            POLICY _policy;
-        };
-        
-        std::shared_ptr<policy_interface> _policy;
-    };
-    
-    template<typename PARTICLE_DATA_POLICY>
-    class pipelined_evolution_policy
-    {
-    public:
-        using stage_type = cpp::particle_evolution_policy<PARTICLE_DATA_POLICY>;
-        
-        void operator()( PARTICLE_DATA_POLICY& data )
-        {
-            /* Nótese que data es una referencia a los datos de la partícula 
-             *
-             * pipelined_evolution_policy aprovecha esa característica para simular 
-             * un pipeline de políticas de evolución, es decir, una política de 
-             * evolución por etapas:
-             * 
-             *     STAGE 1
-             *   -----------
-             *     STAGE 2
-             *   -----------
-             *       ...    
-             *   -----------
-             *     STAGE N
-             * 
-             *  Donde cada etapa es una política de evolución propiamente dicha.
-             * 
-             * La idea es que la etapa n+1 coge como datos de entrada el resultado
-             * de la etapa n, y así sucesivamente. Al ser los datos de la partícula
-             * pasados como una referencia, ése comportamiento es muy fácil de simular 
-             * (Un simple bucle a través del pipeline)
-             */
-            for( auto& policy : _pipeline )
-                policy( data );
-        }
-        
-        void step( cpp::evolution_policy_step step_type )
-        {
-            for( auto& policy : _pipeline )
                 policy.step( step_type );
-        }
+            }
+        };
         
-        auto begin() const
+        template<typename POLICY , typename IS_SHARED>
+        struct stepper<POLICY , IS_SHARED , tml::false_type>
         {
-            return std::begin( _pipeline );
-        }
+            static void execute( POLICY& policy , cpp::evolution_policy_step step_type )
+            {}
+        };
         
-        auto end() const
-        {
-            return std::end( _pipeline );
-        }
         
-        auto rbegin() const
-        {
-            return _pipeline.rbegin();
-        }
-        
-        auto rend() const
-        {
-            return _pipeline.rend();
-        }
-        
-        const stage_type& operator[]( std::size_t stage ) const
-        {
-            return _pipeline[stage];
-        }
-        
-        stage_type& operator[]( std::size_t stage )
-        {
-            return _pipeline[stage];
-        }
+        template<typename POLICY , typename IS_SHARED>
+        struct caller;
         
         template<typename POLICY>
-        void add_stage( POLICY&& policy )
+        struct caller<POLICY,tml::true_type>
         {
-            _pipeline.push_back( std::forward<POLICY>( policy ) );
-        }
+            template<typename PARTICLE_DATA>
+            static void execute( POLICY& policy , PARTICLE_DATA& data )
+            {
+                (*policy)( data );
+            }
+        };
         
         template<typename POLICY>
-        void insert_stage( std::size_t stage , POLICY&& policy )
+        struct caller<POLICY,tml::false_type>
         {
-            _pipeline.insert( _pipeline.begin() + stage , std::forward<POLICY>( policy ) );
-        }
-        
-        void remove_stage( std::size_t stage )
-        {
-            _pipeline.erase( _pipeline.begin() + stage );
-        }
-        
-    private:
-        std::vector<cpp::particle_evolution_policy<PARTICLE_DATA_POLICY>> _pipeline;
-    };
+            template<typename PARTICLE_DATA>
+            static void execute( POLICY& policy , PARTICLE_DATA& data )
+            {
+                policy( data );
+            }
+        };
+    }
     
+    template<typename POLICY , typename PARTICLE_DATA>
+    void policy_call( POLICY& policy , PARTICLE_DATA& data )
+    {
+        impl::caller<POLICY,cpp::is_shared_policy<POLICY,PARTICLE_DATA>>::execute( policy , data );
+    }
+    
+    template<typename PARTICLE_DATA , typename POLICY>
+    void policy_step( POLICY& policy , cpp::evolution_policy_step step_type )
+    {
+        impl::stepper<POLICY,cpp::is_shared_policy<POLICY,PARTICLE_DATA> , cpp::has_state<POLICY>>::execute( policy , step_type );
+    }
 }
 
 #endif	/* PARTICLE_EVOLUTION_POLICIES_HPP */

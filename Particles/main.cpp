@@ -28,19 +28,8 @@
 
 sf::RenderWindow window;
 
-
-#define USE_RECTANGLE_BOUNDS
-
-
 cpp::fireworks::fireworks_engine engine{ 15000u , dl32::vector_2df{400.0f , 300.0f } , 0.006f };
-
-#ifdef USE_RECTANGLE_BOUNDS
 cpp::bounded::bounded_engine bounded_engine;
-#else
-cpp::bounded::bounded_engine<cpp::circle_bounds> bounded_engine{ 10000u , dl32::vector_2df{400.0f , 300.0f } , 0.06f , 
-                                                                 cpp::circle_bounds{ dl32::vector_2df{ 450.0f , 350.0f } , 250.0f }
-                                                               };                
-#endif
                                            
                                            
 void events_loop()
@@ -77,7 +66,11 @@ void game_loop()
 
 void init_pipeline()
 {
-    cpp::pipelined_evolution_policy<cpp::default_particle_data_holder> pipeline;
+    auto lambda = []( cpp::default_particle_data_holder& ) {};
+    
+    TURBO_ASSERT( (tml::logical_not<cpp::has_state<decltype(lambda)>>) , "lambda with state???" );
+    
+    cpp::evolution_policies_pipeline<cpp::default_particle_data_holder> pipeline;
     
     pipeline.add_stage( cpp::make_bounds_policy( cpp::inverse_bounds<cpp::circle_bounds>{ dl32::vector_2df{ 400.0f , 300.0f } , 100.0f } ) );
     pipeline.add_stage( cpp::make_bounds_policy( cpp::rectangle_bounds{ cpp::aabb_2d<float>::from_coords_and_size( 0.0f , 0.0f , 800.0f , 600.0f ) } ) );

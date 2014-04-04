@@ -50,9 +50,9 @@ namespace cpp
         {
             _data_policy.position() += _data_policy.speed();
             
-            _evolution_policy( _data_policy ); //Ejecutamos la política de evolución de los datos
+            cpp::policy_call( _evolution_policy , _data_policy ); //Ejecutamos la política de evolución de los datos
             
-            _evolution_policy.step( cpp::evolution_policy_step::individual );
+            cpp::policy_step<DATA_POLICY>( _evolution_policy , cpp::evolution_policy_step::individual );
         }
         
         template<typename CANVAS>
@@ -63,7 +63,7 @@ namespace cpp
         
     private:     
         data_policy_t      _data_policy;
-        cpp::particle_evolution_policy<DATA_POLICY> _evolution_policy; //Type-erased evolution policy for uniform access. 
+        evolution_policy_t _evolution_policy;
         drawing_policy_t   _drawing_policy;
         
         //using particle_size = decltype( tml::size_of<DATA_POLICY>{} + tml::size_of<EVOLUTION_POLICY>{} + tml::size_of<DRAWING_POLICY>{} );
@@ -74,20 +74,16 @@ namespace cpp
     struct basic_particle_engine
     {
     private:
+        template<typename PARTICLE_DATA>
         void step_evolution_policies() const
         {}
         
-        template<typename HEAD , typename... TAIL>
+        template<typename PARTICLE_DATA , typename HEAD , typename... TAIL>
         void step_evolution_policies( HEAD& head , TAIL&... tail ) const
         {
-            head.step( cpp::evolution_policy_step::global );
-            step_evolution_policies( tail... );
-        }
-        
-        template<typename PARTICLE_DATA , typename POLICY>
-        static cpp::particle_evolution_policy<PARTICLE_DATA> erase( const POLICY& policy )
-        {
-            return { policy };
+            cpp::policy_step<PARTICLE_DATA>( head , cpp::evolution_policy_step::global );
+            
+            step_evolution_policies<PARTICLE_DATA>( tail... );
         }
         
     protected:
@@ -99,6 +95,8 @@ namespace cpp
             
             for( auto& particle : particles )
                 particle.step();
+            
+            step_evolution_policies<particle_data>( evolution_policies... );
         }
         
         template<typename PARTICLES , typename DRAWING_POLICY , typename CANVAS>
