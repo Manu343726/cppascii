@@ -16,6 +16,8 @@
 
 #include "../snippets/Turbo/core.hpp"
 
+#include "particle_evolution_policies.hpp"
+
 namespace cpp
 {
     /* Type-erased particle evolution policy */

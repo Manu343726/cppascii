@@ -68,15 +68,15 @@ void init_pipeline()
 {
     auto lambda = []( cpp::default_particle_data_holder& ) {};
     
-    TURBO_ASSERT( (tml::logical_not<cpp::has_state<decltype(lambda)>>) , "lambda with state???" );
+    TURBO_ASSERT( (tml::logical_not<cpp::is_stated_policy<decltype(lambda),cpp::default_particle_data_holder>>) , "lambda with state???" );
     
     cpp::evolution_policies_pipeline<cpp::default_particle_data_holder> pipeline;
     
-    pipeline.add_stage( cpp::make_bounds_policy( cpp::inverse_bounds<cpp::circle_bounds>{ dl32::vector_2df{ 400.0f , 300.0f } , 100.0f } ) );
+    pipeline.add_stage( cpp::make_bounds_policy( cpp::inverse_bounds<cpp::circle_bounds>{ dl32::vector_2df{ 400.0f , 300.0f } , 300.0f } ) );
     pipeline.add_stage( cpp::make_bounds_policy( cpp::rectangle_bounds{ cpp::aabb_2d<float>::from_coords_and_size( 0.0f , 0.0f , 800.0f , 600.0f ) } ) );
     pipeline.add_stage( []( cpp::default_particle_data_holder& data )
                         {
-                           data.speed() *= 1.001f;
+                           data.speed() *= 1.0001f;
                         }
                       );
     pipeline.add_stage( []( cpp::default_particle_data_holder& data )

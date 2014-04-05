@@ -15,13 +15,13 @@ CND_PACKAGE_DIR_Debug=dist/Debug/GNU-Linux-x86/package
 CND_PACKAGE_NAME_Debug=particles.tar
 CND_PACKAGE_PATH_Debug=dist/Debug/GNU-Linux-x86/package/particles.tar
 # Release configuration
-CND_PLATFORM_Release=MinGW-Windows
-CND_ARTIFACT_DIR_Release=dist/Release/MinGW-Windows
+CND_PLATFORM_Release=GNU-Linux-x86
+CND_ARTIFACT_DIR_Release=dist/Release/GNU-Linux-x86
 CND_ARTIFACT_NAME_Release=particles
-CND_ARTIFACT_PATH_Release=dist/Release/MinGW-Windows/particles
-CND_PACKAGE_DIR_Release=dist/Release/MinGW-Windows/package
+CND_ARTIFACT_PATH_Release=dist/Release/GNU-Linux-x86/particles
+CND_PACKAGE_DIR_Release=dist/Release/GNU-Linux-x86/package
 CND_PACKAGE_NAME_Release=particles.tar
-CND_PACKAGE_PATH_Release=dist/Release/MinGW-Windows/package/particles.tar
+CND_PACKAGE_PATH_Release=dist/Release/GNU-Linux-x86/package/particles.tar
 # Release_windows configuration
 CND_PLATFORM_Release_windows=MinGW-Windows
 CND_ARTIFACT_DIR_Release_windows=dist/Release_windows/MinGW-Windows

@@ -188,7 +188,7 @@ namespace cpp
     template<typename PARTICLE_DATA , typename POLICY>
     void policy_step( POLICY& policy , cpp::evolution_policy_step step_type )
     {
-        impl::stepper<POLICY,cpp::is_shared_policy<POLICY,PARTICLE_DATA> , cpp::has_state<POLICY>>::execute( policy , step_type );
+        impl::stepper<POLICY,cpp::is_shared_policy<POLICY,PARTICLE_DATA> , cpp::is_stated_policy<POLICY,PARTICLE_DATA>>::execute( policy , step_type );
     }
 }
 
