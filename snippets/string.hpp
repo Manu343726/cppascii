@@ -101,13 +101,13 @@ namespace cpp
         //ctor para rvalues: Te robo lo tuyo y tu te quedas sin nada (Move semantics)
         basic_string(basic_string&& other )
         {
-            _data = other._data;
+            _data = std::move( other._data );
             other._data = nullptr;
             
-            _array_length = other._array_length;
+            _array_length = std::move( other._array_length );
             other._array_length = 0;
             
-            _string_length = other._string_length;
+            _string_length = std::move( other._string_length );
             other._string_length = 0;
         }
         
@@ -116,13 +116,13 @@ namespace cpp
         {
             delete[] _data;
             
-            _data = other._data;
+            _data = std::move( other._data );
             other._data = nullptr;
             
-            _array_length = other._array_length;
+            _array_length = std::move( other._array_length );
             other._array_length = 0;
             
-            _string_length = other._string_length;
+            _string_length = std::move( other._string_length );
             other._string_length = 0;
             
             
