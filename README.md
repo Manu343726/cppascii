@@ -6,8 +6,8 @@ Un pequeño curso sobre la programación en C++ orientado al desarrollo de video
 
 ## Horario
 
-Martes 17:00 - 18:00, aula 13 Facultad de Informática UCM    
-Jueves 16:00 - 17:30, aula 13 Facultad de Informática UCM
+Lunes 16:00 - 17:00, aula 6 Facultad de Informática UCM    
+Viernes 16:00 - 17:00, aula 6 Facultad de Informática UCM
 
 *Éste horario está sujeto a cambios a partir de Febrero. Segúramente hagamos una pequeña encuesta para ver que horario nos viene mejor a todos.*
 
@@ -19,6 +19,7 @@ Jueves 16:00 - 17:30, aula 13 Facultad de Informática UCM
 *Mi objetivo no es que seáis expertos en C++, sino que entendáis que es lo que hacéis, y seais conscientes de lo que hacen vuestros programas, el compilador, y el lenguaje. Por supuesto cuanto más demos de juegos mejor, y todos los ejemplos, prácticas, etc los haré sobre juegos o cosas relacionadas con ellos.*    
 *El punto 5 se considera C++ avanzado, así que no pasaría nada si no llego a darlo del todo, pero hasta el punto 4 se considera muy importante (Importante quiere decir que si no tienes perfectamente claro hasta ahí no sabes C++).*
 
+**NOTA:** El temario es el del año pasado (curso 2013/2014), pero sigue siendo válido.
 
 0. **Sistema Operativo, Hardware, etc: ¿Donde y cómo se ejecuta mi programa?**  
     1. CPU, RAM, cache  
@@ -133,6 +134,7 @@ Jueves 16:00 - 17:30, aula 13 Facultad de Informática UCM
         - Multidimensional Analog Literals (aka la mayor frikada que he visto en mi vida, y que por supuesto he usado en algunas prácticas... Inicializar el frustum de la cámara dibujando un cubo? Por qué no?)
     9. Extreme Template Metaprogramming
         - [Turbo](https://github.com/Manu343726/Turbo) (Lo siento, tenía que hacerme propaganda. Todavía intento colarlo como trabajo de fin de grado...)
+        - [Flux](https://github.com/Manu343726/Flux) (Más propaganda. A Eric Niebler le moló, a ver si a vosotros también).
         - [Boost::mpl](http://www.boost.org/doc/libs/1_55_0/libs/mpl/doc/index.html)
 
 ## Bibliografía:
@@ -147,7 +149,7 @@ Esta lista no incluye todos los libros que os he pasado, incluye solo los que cr
 Explica detalladamente todos y cada uno de los conceptos del lenguaje. Aunque es de hace algunos años y puede que haya cosas que ahora no sean correctas del todo, sigue siendo un muy buen libro.   
 Está disponible en la biblioteca de la facultad.
 
-- ***"The C++ Programming Language"*** : Es el libro del creador del lenguaje, Bjarne Stroupstrup.  
+- ***"The C++ Programming Language"*** : Es el libro del creador del lenguaje, Bjarne Stroustrup.  
 Aunque no es un libro para aprender, es un libro de referencia y demostración del lenguaje, contiene buenas anotaciones y explicaciones para programadores noveles.  
 Mi recomendación es que lo leáis en paralelo junto con "Thinking", hay cosas que puede que estén mejor explicadas en uno, y viceversa.  
 En la biblioteca de la facultad está disponible la tercera edición, pero no os recomiendo que lo cojáis. Es de hace bastantes años, y ya me parece suficiente que tengáis un libro anticuado, más es demasiado. El que os he pasado en PDF es la última edición. Por supuesto si os pica la curiosidad podéis cojer ambos para comparar y ver como ha evolucionado el lenguaje.
@@ -161,7 +163,7 @@ Estos libros están pensados para gente que ya tiene asentadas las bases del len
 ### C++ Avanzado
 Aquí nos adentramos en los rincones oscuros de C++. Como programador normal de C++ no es absolutamente necesario conocer ésto, pero si quieres saber lo potente (En cuanto a rendimiento y expresividad) puede llegar a ser C++, tienes que conocer éstas cosas.
 
- - ***"Modern C++ Dessign"*** : Tras la publicación de "Dessign Patterns", de la Banda de Los Cuatro Payasos (Perdón, la Banda de Los Cuatro), aparecieron un montón de libros que básicamente se resumían en *"Vale tíos, que os habéis fumado? Todas esas chorradas de diseño están muy bien, pero eso HAY QUE IMPLEMENTARLO DE ALGUNA MANERA. Imaginar diseños desde las nubes está muy bien, pero en la práctica no funciona."*  
+ - ***"Modern C++ Design"*** : Tras la publicación de "Design Patterns", de la Banda de Los Cuatro Payasos (Perdón, la Banda de Los Cuatro), aparecieron un montón de libros que básicamente se resumían en *"Vale tíos, que os habéis fumado? Todas esas chorradas de diseño están muy bien, pero eso HAY QUE IMPLEMENTARLO DE ALGUNA MANERA. Imaginar diseños desde las nubes está muy bien, pero en la práctica no funciona."*  
 Este es uno de esos libros. Es un libro que cubre metodologías de diseño con C++, implementaciones reales y eficientes de patrones de diseño, y discusiones sobre por qué las chorradas de GoF en la realidad no funcionan.  
 Dejándo a un lado el tema del diseño, las tecnologías y metodologías que muestra para resolver esos problemas muestran las capacidades de C++, que en muchos aspectos ningún otro lenguaje tiene.  
 Es el libro que te abre los ojos a lo que C++ puede llegar a hacer.
