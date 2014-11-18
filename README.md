@@ -1,8 +1,8 @@
 
 
-# C++ Orientado a la programación de Videojuegos
+# Curso C++
 
-Un pequeño curso sobre la programación en C++ orientado al desarrollo de videojuegos.
+Un pequeño curso sobre la programación en C++, utilizando videojuegos en lugar de videoclubs.
 
 ## Horario
 
