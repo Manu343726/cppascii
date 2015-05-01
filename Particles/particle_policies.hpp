@@ -50,7 +50,7 @@ namespace cpp
         {
             _data_policy.position() += _data_policy.speed();
             
-            cpp::policy_call( _evolution_policy , _data_policy ); //Ejecutamos la política de evolución de los datos
+            cpp::policy_call( _evolution_policy , _data_policy ); //Ejecutamos la política de evolución sobre los datos
             
             cpp::policy_step<DATA_POLICY>( _evolution_policy , cpp::evolution_policy_step::individual );
         }
